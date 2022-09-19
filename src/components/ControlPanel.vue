@@ -10,5 +10,17 @@ import DrawLine from "./DrawLine.vue"
       </template>
       <DrawLine></DrawLine>
     </el-sub-menu>
+    <el-sub-menu index="2">
+      <template #title>
+        <span>画圆</span>
+      </template>
+      WIP
+    </el-sub-menu>
+    <el-sub-menu index="3">
+      <template #title>
+        <span>画椭圆</span>
+      </template>
+      WIP
+    </el-sub-menu>
   </el-menu>
 </template>

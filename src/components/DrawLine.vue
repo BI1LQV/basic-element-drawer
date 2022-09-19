@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { reactive } from "vue"
 import { LineAlgorism, PixelState } from "@/model"
-import { playgroundState, sizeX, sizeY } from "@/store"
+import { initPlayground, playgroundState, sizeX, sizeY } from "@/store"
 import { DDALine } from "@/utils"
 let form = reactive({
   algorism: LineAlgorism.DDA,
@@ -11,6 +11,7 @@ let form = reactive({
   endY: 3,
 })
 function drawLine() {
+  initPlayground()
   const { startX, startY, endX, endY } = form
   DDALine(startX, startY, endX, endY)
     .forEach(([x, y]) => playgroundState.value[x * sizeY.value + y] = PixelState.line)
@@ -20,14 +21,14 @@ function drawLine() {
 <template>
   <el-form :model="form" label-width="120px">
     <el-form-item label="起始点">
-      <el-input-number v-model="form.startX" :min="1" :max="sizeX" />
+      <el-input-number v-model="form.startX" :min="0" :max="sizeX - 1" />
       <span m-1 text-xl>,</span>
-      <el-input-number v-model="form.startY" :min="1" :max="sizeY" />
+      <el-input-number v-model="form.startY" :min="0" :max="sizeY - 1" />
     </el-form-item>
     <el-form-item label="结束点">
-      <el-input-number v-model="form.endX" :min="1" :max="sizeX" />
+      <el-input-number v-model="form.endX" :min="0" :max="sizeX - 1" />
       <span m-1 text-xl>,</span>
-      <el-input-number v-model="form.endY" :min="1" :max="sizeY" />
+      <el-input-number v-model="form.endY" :min="0" :max="sizeY - 1" />
     </el-form-item>
     <el-form-item label="选择算法">
       <el-radio-group v-model="form.algorism" class="ml-4">
