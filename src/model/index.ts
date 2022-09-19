@@ -3,3 +3,7 @@ export enum PixelState {
   line,
   fill,
 }
+export enum LineAlgorism {
+  DDA,
+  Bresenham,
+}
