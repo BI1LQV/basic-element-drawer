@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import DrawLine from "./DrawLine.vue"
+import DrawCirc from "./DrawCirc.vue"
 </script>
 
 <template>
@@ -14,7 +15,7 @@ import DrawLine from "./DrawLine.vue"
       <template #title>
         <span>画圆</span>
       </template>
-      WIP
+      <DrawCirc></DrawCirc>
     </el-sub-menu>
     <el-sub-menu index="3">
       <template #title>
