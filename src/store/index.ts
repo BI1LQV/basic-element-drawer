@@ -12,3 +12,14 @@ export function initPlayground() {
 watch([sizeX, sizeY], () => {
   initPlayground()
 }, { immediate: true })
+
+export const clickedPoint = ref("")
+export const allowClick = ref(false)
+export const requestPoint = () => new Promise<number[]>((resolve) => {
+  allowClick.value = true
+  const cancelWatcher = watch(clickedPoint, () => {
+    cancelWatcher()
+    allowClick.value = false
+    resolve(clickedPoint.value.split("_").map(i => Number(i)))
+  })
+})
