@@ -2,7 +2,7 @@
 import { reactive } from "vue"
 import { LineAlgorism, PixelState } from "@/model"
 import { initPlayground, playgroundState, sizeX, sizeY } from "@/store"
-import { DDALine } from "@/utils"
+import { BresenhamLine, DDALine } from "@/utils"
 let form = reactive({
   algorism: LineAlgorism.DDA,
   startX: 0,
@@ -12,9 +12,15 @@ let form = reactive({
 })
 function drawLine() {
   initPlayground()
-  const { startX, startY, endX, endY } = form
-  DDALine(startX, startY, endX, endY)
-    .forEach(([x, y]) => playgroundState.value[x * sizeY.value + y] = PixelState.line)
+  const { startX, startY, endX, endY, algorism } = form
+  if (algorism === LineAlgorism.DDA) {
+    DDALine(startX, startY, endX, endY)
+      .forEach(([x, y]) => playgroundState.value[x * sizeY.value + y] = PixelState.line)
+  } else if (algorism === LineAlgorism.Bresenham) {
+    console.log(BresenhamLine(startX, startY, endX, endY))
+    BresenhamLine(startX, startY, endX, endY)
+      .forEach(([x, y]) => playgroundState.value[x * sizeY.value + y] = PixelState.line)
+  }
 }
 </script>
 
