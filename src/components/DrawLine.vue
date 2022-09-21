@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { reactive } from "vue"
 // @ts-expect error
-import {
-  Pointer,
-} from "@element-plus/icons-vue"
+import { Pointer } from "@element-plus/icons-vue"
+import PickPixel from "./PickPixel.vue"
 import { LineAlgorism, PixelState } from "@/model"
 import { drawState, initPlayground, playgroundState, requestPoint, sizeX, sizeY } from "@/store"
 import { BresenhamLine, DDALine, pixelToIdx } from "@/utils"
@@ -24,25 +23,16 @@ function drawLine() {
     drawState(BresenhamLine(startX, startY, endX, endY))
   }
 }
-type FormKey = keyof typeof form
-async function pickPoint(target: typeof form, xAttrName: FormKey, yAttrName: FormKey) {
-  const originIdx = pixelToIdx(target[xAttrName], target[yAttrName])
-  if (playgroundState.value[originIdx] === PixelState.selected) {
-    playgroundState.value[originIdx] = PixelState.empty
-  }
-  let [x, y] = await requestPoint()
-  target[xAttrName] = x
-  target[yAttrName] = y
+function updatePixel([x, y]: number[]) {
+  form.startX = x
+  form.startY = y
 }
 </script>
 
 <template>
   <el-form :model="form" label-width="120px">
     <el-form-item label="起始点">
-      <el-input-number v-model="form.startX" :min="0" :max="sizeX - 1" />
-      <span m-1 text-xl>,</span>
-      <el-input-number v-model="form.startY" :min="0" :max="sizeY - 1" />
-      <el-button type="primary" :icon="Pointer" size="small" circle @click="pickPoint(form, 'startX', 'startY')" />
+      <PickPixel :x="form.startX" :y="form.startY" @update:pixel="updatePixel"></PickPixel>
     </el-form-item>
     <el-form-item label="结束点">
       <el-input-number v-model="form.endX" :min="0" :max="sizeX - 1" />
