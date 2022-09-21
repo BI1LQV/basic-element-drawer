@@ -1,10 +1,10 @@
 import { ref, watch } from "vue"
 import { PixelState } from "@/model"
-
+import { is2DArray, sleep } from "@/utils"
 export const sizeX = ref(80)
 export const sizeY = ref(80)
 
-export const drawInterval = ref(500)
+export const drawLastTime = ref(1000)
 
 export const playgroundState = ref<PixelState[]>([])
 
@@ -26,6 +26,21 @@ export const requestPoint = () => new Promise<number[]>((resolve) => {
   })
 })
 
-export function drawState(pixels: number[][]) {
+export function drawState(...pixels: number[][]) {
   pixels.forEach(([x, y]) => playgroundState.value[x * sizeY.value + y] = PixelState.line)
 }
+
+export async function drawStateWithInterval(
+  pixels: Iterable<number[][]> | Iterable<number[]>,
+  interval: number,
+) {
+  for (const maybeGroup of pixels) {
+    if (is2DArray(maybeGroup)) {
+      drawState(...maybeGroup)
+    } else {
+      drawState(maybeGroup)
+    }
+    await sleep(interval)
+  }
+}
+

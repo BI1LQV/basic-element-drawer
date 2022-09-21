@@ -2,7 +2,7 @@
 import { reactive } from "vue"
 import PickPixel from "./PickPixel.vue"
 import { LineAlgorism } from "@/model"
-import { drawState, initPlayground } from "@/store"
+import { drawLastTime, drawStateWithInterval, initPlayground } from "@/store"
 import { BresenhamLine, DDALine, updatePixelToForm } from "@/utils"
 let form = reactive({
   algorism: LineAlgorism.DDA,
@@ -15,10 +15,11 @@ function drawLine() {
   initPlayground()
   const { startX, startY, endX, endY, algorism } = form
   if (algorism === LineAlgorism.DDA) {
-    drawState(DDALine(startX, startY, endX, endY))
+    const pixels = DDALine(startX, startY, endX, endY)
+    drawStateWithInterval(pixels, drawLastTime.value / pixels.length)
   } else if (algorism === LineAlgorism.Bresenham) {
-    console.log(BresenhamLine(startX, startY, endX, endY))
-    drawState(BresenhamLine(startX, startY, endX, endY))
+    const pixels = BresenhamLine(startX, startY, endX, endY)
+    drawStateWithInterval(pixels, drawLastTime.value / pixels.length)
   }
 }
 </script>

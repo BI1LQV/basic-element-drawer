@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { reactive } from "vue"
-import { drawInterval, drawState, initPlayground, sizeX } from "@/store"
-import { centerCirc, sleep, updatePixelToForm } from "@/utils"
+import { drawLastTime, drawStateWithInterval, initPlayground, sizeX } from "@/store"
+import { centerCirc, updatePixelToForm } from "@/utils"
 
 let form = reactive({
   startX: 10,
@@ -11,11 +11,7 @@ let form = reactive({
 async function drawCirc() {
   initPlayground()
   const { startX, startY, r } = form
-  let circIter = centerCirc(startX, startY, r)
-  for (let part of circIter) {
-    drawState(part)
-    await sleep(drawInterval.value)
-  }
+  drawStateWithInterval(centerCirc(startX, startY, r), drawLastTime.value / 8)
 }
 </script>
 
