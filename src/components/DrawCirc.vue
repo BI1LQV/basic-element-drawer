@@ -5,18 +5,22 @@ import {
   Pointer,
 } from "@element-plus/icons-vue"
 import { PixelState } from "@/model"
-import { drawState, initPlayground, playgroundState, requestPoint, sizeX, sizeY } from "@/store"
-import { centerCirc, pixelToIdx } from "@/utils"
+import { drawInterval, drawState, initPlayground, playgroundState, requestPoint, sizeX, sizeY } from "@/store"
+import { centerCirc, pixelToIdx, sleep } from "@/utils"
 
 let form = reactive({
   startX: 10,
   startY: 10,
   r: 5,
 })
-function drawCirc() {
+async function drawCirc() {
   initPlayground()
   const { startX, startY, r } = form
-  drawState(centerCirc(startX, startY, r))
+  let circIter = centerCirc(startX, startY, r)
+  for (let part of circIter) {
+    drawState(part)
+    await sleep(drawInterval.value)
+  }
 }
 type FormKey = keyof typeof form
 async function pickPoint(target: typeof form, xAttrName: FormKey, yAttrName: FormKey) {

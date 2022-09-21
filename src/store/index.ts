@@ -1,8 +1,10 @@
 import { ref, watch } from "vue"
 import { PixelState } from "@/model"
 
-export const sizeX = ref(30)
-export const sizeY = ref(30)
+export const sizeX = ref(80)
+export const sizeY = ref(80)
+
+export const drawInterval = ref(500)
 
 export const playgroundState = ref<PixelState[]>([])
 

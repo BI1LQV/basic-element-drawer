@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Playground from "./components/Playground.vue"
-import { initPlayground, sizeX, sizeY } from "./store"
+import { drawInterval, initPlayground, sizeX, sizeY } from "./store"
 import ControlPanel from "./components/ControlPanel.vue"
 </script>
 
@@ -9,6 +9,7 @@ import ControlPanel from "./components/ControlPanel.vue"
     画板分辨率：
     X:<el-input-number v-model="sizeX" m-3></el-input-number>
     Y:<el-input-number v-model="sizeY" m-3></el-input-number>
+    绘画各步间隔(ms):<el-input-number v-model="drawInterval" m-3 :step="100" :min="0"></el-input-number>
     <el-button type="danger" @click="initPlayground">清除</el-button>
   </div>
   <div h-full w-full flex class="main-base">
