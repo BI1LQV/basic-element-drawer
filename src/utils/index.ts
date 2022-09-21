@@ -13,9 +13,9 @@ export function sleep(ms: number) {
   })
 }
 
-export function updatePixelToForm(
-  [x, y]: number[],
-  target: any, attrX: string, attrY: string,
+export function updatePixelToForm<T, K extends keyof T>(
+  [x, y]: T[K][],
+  target: T, attrX: K, attrY: K,
 ) {
   target[attrX] = x
   target[attrY] = y
