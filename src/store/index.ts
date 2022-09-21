@@ -23,3 +23,7 @@ export const requestPoint = () => new Promise<number[]>((resolve) => {
     resolve(clickedPoint.value.split("_").map(i => Number(i)))
   })
 })
+
+export function drawState(pixels: number[][]) {
+  pixels.forEach(([x, y]) => playgroundState.value[x * sizeY.value + y] = PixelState.line)
+}

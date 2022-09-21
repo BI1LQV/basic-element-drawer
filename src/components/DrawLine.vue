@@ -5,7 +5,7 @@ import {
   Pointer,
 } from "@element-plus/icons-vue"
 import { LineAlgorism, PixelState } from "@/model"
-import { initPlayground, playgroundState, requestPoint, sizeX, sizeY } from "@/store"
+import { drawState, initPlayground, playgroundState, requestPoint, sizeX, sizeY } from "@/store"
 import { BresenhamLine, DDALine, pixelToIdx } from "@/utils"
 let form = reactive({
   algorism: LineAlgorism.DDA,
@@ -18,12 +18,10 @@ function drawLine() {
   initPlayground()
   const { startX, startY, endX, endY, algorism } = form
   if (algorism === LineAlgorism.DDA) {
-    DDALine(startX, startY, endX, endY)
-      .forEach(([x, y]) => playgroundState.value[x * sizeY.value + y] = PixelState.line)
+    drawState(DDALine(startX, startY, endX, endY))
   } else if (algorism === LineAlgorism.Bresenham) {
     console.log(BresenhamLine(startX, startY, endX, endY))
-    BresenhamLine(startX, startY, endX, endY)
-      .forEach(([x, y]) => playgroundState.value[x * sizeY.value + y] = PixelState.line)
+    drawState(BresenhamLine(startX, startY, endX, endY))
   }
 }
 type FormKey = keyof typeof form
