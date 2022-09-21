@@ -4,6 +4,7 @@ specifiers:
   '@bi1lqv/eslint-config': ^0.26.11
   '@element-plus/icons-vue': ^2.0.9
   '@rushstack/eslint-patch': ^1.1.4
+  '@types/jsdom': ^20.0.0
   '@types/node': ^16.11.56
   '@vitejs/plugin-vue': ^3.0.3
   '@vue/eslint-config-typescript': ^11.0.0
@@ -33,6 +34,7 @@ devDependencies:
   '@bi1lqv/eslint-config': 0.26.11_sorwav4hsh5vncerguqybud76i
   '@element-plus/icons-vue': 2.0.9_vue@3.2.39
   '@rushstack/eslint-patch': 1.1.4
+  '@types/jsdom': 20.0.0
   '@types/node': 16.11.58
   '@vitejs/plugin-vue': 3.1.0_vite@3.1.0+vue@3.2.39
   '@vue/eslint-config-typescript': 11.0.1_r4pnssklstyy5blkxbeioxjlhm
@@ -387,6 +389,14 @@ packages:
     resolution: {integrity: sha512-hC7OMnszpxhZPduX+m+nrx+uFoLkWOMiR4oa/AZF3MuSETYTZmFfJAHqZEM8MVlvfG7BEUcgvtwoCTxBp6hm3g==}
     dev: true
 
+  /@types/jsdom/20.0.0:
+    resolution: {integrity: sha512-YfAchFs0yM1QPDrLm2VHe+WHGtqms3NXnXAMolrgrVP6fgBHHXy1ozAbo/dFtPNtZC/m66bPiCTWYmqp1F14gA==}
+    dependencies:
+      '@types/node': 16.11.58
+      '@types/tough-cookie': 4.0.2
+      parse5: 7.1.1
+    dev: true
+
   /@types/json-schema/7.0.11:
     resolution: {integrity: sha512-wOuvG1SN4Us4rez+tylwwwCV1psiNVOkJeM3AUWUNWg/jDQY2+HE/444y5gc+jBmRqASOm2Oeh5c1axHobwRKQ==}
     dev: true
@@ -417,6 +427,10 @@ packages:
 
   /@types/normalize-package-data/2.4.1:
     resolution: {integrity: sha512-Gj7cI7z+98M282Tqmp2K5EIsoouUEzbBJhQQzDE3jSIRk6r9gsz0oUokqIUR4u1R3dMHo0pDHM7sNOHyhulypw==}
+    dev: true
+
+  /@types/tough-cookie/4.0.2:
+    resolution: {integrity: sha512-Q5vtl1W5ue16D+nIaW8JWebSSraJVlK+EthKn7e7UcD4KWsaSJ8BqGPXNaPghgtcn/fhvrN17Tv8ksUsQpiplw==}
     dev: true
 
   /@types/unist/2.0.6:
