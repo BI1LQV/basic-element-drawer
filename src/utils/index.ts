@@ -12,3 +12,11 @@ export function sleep(ms: number) {
     }, ms)
   })
 }
+
+export function updatePixelToForm(
+  [x, y]: number[],
+  target: any, attrX: string, attrY: string,
+) {
+  target[attrX] = x
+  target[attrY] = y
+}

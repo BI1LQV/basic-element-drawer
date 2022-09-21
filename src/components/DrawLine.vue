@@ -1,11 +1,9 @@
 <script setup lang="ts">
 import { reactive } from "vue"
-// @ts-expect error
-import { Pointer } from "@element-plus/icons-vue"
 import PickPixel from "./PickPixel.vue"
-import { LineAlgorism, PixelState } from "@/model"
-import { drawState, initPlayground, playgroundState, requestPoint, sizeX, sizeY } from "@/store"
-import { BresenhamLine, DDALine, pixelToIdx } from "@/utils"
+import { LineAlgorism } from "@/model"
+import { drawState, initPlayground } from "@/store"
+import { BresenhamLine, DDALine, updatePixelToForm } from "@/utils"
 let form = reactive({
   algorism: LineAlgorism.DDA,
   startX: 0,
@@ -23,22 +21,21 @@ function drawLine() {
     drawState(BresenhamLine(startX, startY, endX, endY))
   }
 }
-function updatePixel([x, y]: number[]) {
-  form.startX = x
-  form.startY = y
-}
 </script>
 
 <template>
   <el-form :model="form" label-width="120px">
     <el-form-item label="起始点">
-      <PickPixel :x="form.startX" :y="form.startY" @update:pixel="updatePixel"></PickPixel>
+      <PickPixel
+        :x="form.startX" :y="form.startY"
+        @update:pixel="updatePixelToForm($event, form, 'startX', 'startY')"
+      ></PickPixel>
     </el-form-item>
     <el-form-item label="结束点">
-      <el-input-number v-model="form.endX" :min="0" :max="sizeX - 1" />
-      <span m-1 text-xl>,</span>
-      <el-input-number v-model="form.endY" :min="0" :max="sizeY - 1" />
-      <el-button type="primary" :icon="Pointer" size="small" circle @click="pickPoint(form, 'endX', 'endY')" />
+      <PickPixel
+        :x="form.endX" :y="form.endY"
+        @update:pixel="updatePixelToForm($event, form, 'endX', 'endY')"
+      ></PickPixel>
     </el-form-item>
     <el-form-item label="选择算法">
       <el-radio-group v-model="form.algorism" class="ml-4">
