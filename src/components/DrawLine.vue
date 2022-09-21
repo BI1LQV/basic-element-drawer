@@ -27,7 +27,7 @@ function drawLine() {
 type FormKey = keyof typeof form
 async function pickPoint(target: typeof form, xAttrName: FormKey, yAttrName: FormKey) {
   const originIdx = pixelToIdx(target[xAttrName], target[yAttrName])
-  if (playgroundState.value[originIdx] === PixelState.line) {
+  if (playgroundState.value[originIdx] === PixelState.selected) {
     playgroundState.value[originIdx] = PixelState.empty
   }
   let [x, y] = await requestPoint()

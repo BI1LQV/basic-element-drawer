@@ -6,13 +6,14 @@ const STATE_COLOR_MAP = {
   [PixelState.empty]: "bg-gray-500/10",
   [PixelState.line]: "bg-gray-500/90",
   [PixelState.fill]: "bg-yellow-500/50",
+  [PixelState.selected]: "bg-blue-500/50",
 }
 // let isDrawing = false
 function drawPixel(x: number, y: number) {
   // if (!isDrawing) { return }
   if (!allowClick.value) { return }
   clickedPoint.value = `${x}_${y}`
-  playgroundState.value[pixelToIdx(x, y)] = PixelState.line
+  playgroundState.value[pixelToIdx(x, y)] = PixelState.selected
 }
 
 // function startDraw() {
