@@ -1,4 +1,8 @@
 let { abs, max, round } = Math
+enum SeqReverseFlag {
+  reversed = -1,
+  unReversed = 1,
+}
 export function DDALine(xa: number, ya: number, xb: number, yb: number) {
   let dx = xb - xa
   let dy = yb - ya
@@ -22,10 +26,11 @@ export function BresenhamLine(xa: number, ya: number, xb: number, yb: number) {
   let mainAxis
   let minorAxis
   let mainAxisEnd
-  let dx = xb - xa
-  let dy = yb - ya
   let dMainAxis
   let dMinorAxis
+
+  let dx = xb - xa
+  let dy = yb - ya
 
   let xyReversed = false
   if (abs(dx) > abs(dy)) {
@@ -45,27 +50,26 @@ export function BresenhamLine(xa: number, ya: number, xb: number, yb: number) {
     xyReversed = true
   }
 
-  let minorReversed = false
+  let minorReversed = SeqReverseFlag.unReversed
   if (dMinorAxis < 0) {
     minorAxis *= -1
     dMinorAxis *= -1
-    minorReversed = true
+    minorReversed = SeqReverseFlag.reversed
   }
 
-  let mainReversed = false
+  let mainReversed = SeqReverseFlag.unReversed
   if (dMainAxis < 0) {
     mainAxis *= -1
     dMainAxis *= -1
     mainAxisEnd *= -1
-    mainReversed = true
+    mainReversed = SeqReverseFlag.reversed
   }
-
+  // main logic
   let pi = 2 * dMinorAxis - dMainAxis
   let res = []
   res.push([mainAxis, minorAxis])
   mainAxis += 1
   for (;mainAxis <= mainAxisEnd; mainAxis++) {
-    console.log(mainAxis)
     if (pi < 0) {
       pi += 2 * dMinorAxis
     } else {
@@ -74,12 +78,10 @@ export function BresenhamLine(xa: number, ya: number, xb: number, yb: number) {
     }
     res.push([mainAxis, minorAxis])
   }
-  if (minorReversed) {
-    res = res.map(([main, minor]) => [main, minor * -1])
+  if (minorReversed + mainReversed !== SeqReverseFlag.unReversed * 2) {
+    res = res.map(([main, minor]) => [main * mainReversed, minor * minorReversed])
   }
-  if (mainReversed) {
-    res = res.map(([main, minor]) => [main * -1, minor])
-  }
+
   if (xyReversed) {
     return res.map(([y, x]) => [x, y])
   }
