@@ -39,7 +39,7 @@ function drawLine() {
       ></PickPixel>
     </el-form-item>
     <el-form-item label="选择算法">
-      <el-radio-group v-model="form.algorism" class="ml-4">
+      <el-radio-group v-model="form.algorism">
         <el-radio :label="LineAlgorism.DDA" size="large">DDA</el-radio>
         <el-radio :label="LineAlgorism.Bresenham" size="large">Bresenham</el-radio>
       </el-radio-group>
