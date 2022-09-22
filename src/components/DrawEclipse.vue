@@ -25,14 +25,14 @@ async function drawEclipse() {
         @update:pixel="updatePixelToForm($event, form, 'startX', 'startY')"
       ></PickPixel>
     </el-form-item>
-    <el-form-item label="a">
+    <el-form-item label="半长轴">
       <el-input-number v-model="form.rX" :min="0" :max="sizeX - 1" />
     </el-form-item>
-    <el-form-item label="b">
+    <el-form-item label="半短轴">
       <el-input-number v-model="form.rY" :min="0" :max="sizeX - 1" />
     </el-form-item>
     <el-form-item>
-      <el-button type="primary" @click="drawEclipse">画圆</el-button>
+      <el-button type="primary" @click="drawEclipse">画椭圆</el-button>
     </el-form-item>
   </el-form>
 </template>
