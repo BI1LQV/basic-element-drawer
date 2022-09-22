@@ -1,5 +1,5 @@
 const { round } = Math
-export function ellipseCore(Rx: number, Ry: number) {
+export function eclipseCore(Rx: number, Ry: number) {
   let Rx2 = Rx * Rx
   let Ry2 = Ry * Ry
   let twoRx2 = 2 * Rx2
@@ -44,7 +44,7 @@ export function ellipseCore(Rx: number, Ry: number) {
 }
 
 export function* centerEclipse(x: number, y: number, Rx: number, Ry: number) {
-  let core = ellipseCore(Rx, Ry)
+  let core = eclipseCore(Rx, Ry)
   yield core.map(([x0, y0]) => [x + y0, y + x0])
   yield core.map(([x0, y0]) => [x - y0, y + x0])
   yield core.map(([x0, y0]) => [x + y0, y - x0])
