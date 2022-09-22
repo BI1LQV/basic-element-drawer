@@ -23,12 +23,7 @@ export function DDALine(xa: number, ya: number, xb: number, yb: number) {
 }
 
 export function BresenhamLine(xa: number, ya: number, xb: number, yb: number) {
-  let mainAxis
-  let minorAxis
-  let mainAxisEnd
-  let dMainAxis
-  let dMinorAxis
-
+  let mainAxis, minorAxis, mainAxisEnd, dMainAxis, dMinorAxis
   let dx = xb - xa
   let dy = yb - ya
 
@@ -70,18 +65,17 @@ export function BresenhamLine(xa: number, ya: number, xb: number, yb: number) {
   res.push([mainAxis, minorAxis])
   mainAxis += 1
   for (;mainAxis <= mainAxisEnd; mainAxis++) {
-    if (pi < 0) {
-      pi += 2 * dMinorAxis
-    } else {
-      pi += -2 * dMainAxis + 2 * dMinorAxis
+    if (pi >= 0) {
+      pi += -2 * dMainAxis
       minorAxis += 1
     }
+    pi += 2 * dMinorAxis
     res.push([mainAxis, minorAxis])
   }
+
   if (minorReversed + mainReversed !== SeqReverseFlag.unReversed * 2) {
     res = res.map(([main, minor]) => [main * mainReversed, minor * minorReversed])
   }
-
   if (xyReversed) {
     return res.map(([y, x]) => [x, y])
   }
