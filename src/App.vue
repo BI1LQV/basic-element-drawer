@@ -1,17 +1,11 @@
 <script setup lang="ts">
 import Playground from "./components/Playground.vue"
-import { drawLastTime, initPlayground, sizeX, sizeY } from "./store"
 import ControlPanel from "./components/ControlPanel.vue"
+import PlaygroundController from "./components/PlaygroundController.vue"
 </script>
 
 <template>
-  <div>
-    画板分辨率：
-    X:<el-input-number v-model="sizeX" m-3></el-input-number>
-    Y:<el-input-number v-model="sizeY" m-3></el-input-number>
-    绘画持续时间(ms):<el-input-number v-model="drawLastTime" m-3 :step="100" :min="0"></el-input-number>
-    <el-button type="danger" @click="initPlayground">清除</el-button>
-  </div>
+  <PlaygroundController></PlaygroundController>
   <div h-full w-full flex class="main-base">
     <ControlPanel class="control-panel-base"></ControlPanel>
     <Playground class="playground-base aspect-square"></Playground>
