@@ -1,8 +1,8 @@
 import { ref, watch } from "vue"
 import { PixelState } from "@/model"
 import { is2DArray, sleep } from "@/utils"
-export const sizeX = ref(80)
-export const sizeY = ref(80)
+export const sizeX = ref(60)
+export const sizeY = ref(60)
 
 export const drawLastTime = ref(1000)
 

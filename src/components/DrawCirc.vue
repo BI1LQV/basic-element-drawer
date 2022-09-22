@@ -4,9 +4,9 @@ import { drawLastTime, drawStateWithInterval, initPlayground, sizeX } from "@/st
 import { centerCirc, updatePixelToForm } from "@/utils"
 
 let form = reactive({
-  startX: 10,
-  startY: 10,
-  r: 5,
+  startX: 20,
+  startY: 20,
+  r: 16,
 })
 async function drawCirc() {
   initPlayground()

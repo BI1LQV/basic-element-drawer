@@ -6,10 +6,10 @@ import { drawLastTime, drawStateWithInterval, initPlayground } from "@/store"
 import { BresenhamLine, DDALine, updatePixelToForm } from "@/utils"
 let form = reactive({
   algorism: LineAlgorism.DDA,
-  startX: 0,
-  startY: 0,
-  endX: 3,
-  endY: 3,
+  startX: 5,
+  startY: 6,
+  endX: 20,
+  endY: 11,
 })
 function drawLine() {
   initPlayground()
