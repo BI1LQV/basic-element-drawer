@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import DrawLine from "./DrawLine.vue"
 import DrawCirc from "./DrawCirc.vue"
+import DrawEclipse from "./DrawEclipse.vue"
 </script>
 
 <template>
@@ -21,7 +22,7 @@ import DrawCirc from "./DrawCirc.vue"
       <template #title>
         <span>画椭圆</span>
       </template>
-      WIP
+      <DrawEclipse></DrawEclipse>
     </el-sub-menu>
   </el-menu>
 </template>
