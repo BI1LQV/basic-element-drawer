@@ -13,42 +13,11 @@ describe("draw line", () => {
 
 describe("draw line", () => {
   it("Bresenham should works", () => {
-    expect(BresenhamLine(3, 3, 9, 6)).toMatchInlineSnapshot(`
-      [
-        [
-          3,
-          3,
-        ],
-        [
-          4,
-          4,
-        ],
-        [
-          5,
-          4,
-        ],
-        [
-          6,
-          4,
-        ],
-        [
-          7,
-          5,
-        ],
-        [
-          8,
-          5,
-        ],
-        [
-          9,
-          5,
-        ],
-      ]
-    `)
     expect(BresenhamLine(3, 3, 9, 6)).toEqual(DDALine(3, 3, 9, 6))
-    // expect(BresenhamLine(1, 1, 6, 5)).toMatchSnapshot()
-    // expect(BresenhamLine(1, 1, 6, 8)).toMatchSnapshot()
-    // expect(BresenhamLine(9, 13, 3, 3)).toMatchSnapshot()
-    // expect(BresenhamLine(-3, 3, -13, 11)).toMatchSnapshot()
+    expect(BresenhamLine(1, 1, 6, 5)).toEqual(DDALine(1, 1, 6, 5))
+    expect(BresenhamLine(1, 1, 6, 6)).toEqual(DDALine(1, 1, 6, 6))
+    expect(BresenhamLine(1, 1, 6, 8)).toEqual(DDALine(1, 1, 6, 8))
+    expect(BresenhamLine(9, 13, 3, 3)).toEqual(DDALine(9, 13, 3, 3))
+    expect(BresenhamLine(-3, 3, -13, 11)).toEqual(DDALine(-3, 3, -13, 11))
   })
 })
