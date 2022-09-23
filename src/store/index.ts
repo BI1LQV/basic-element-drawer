@@ -27,7 +27,10 @@ export const requestPoint = () => new Promise<number[]>((resolve) => {
 })
 
 export function drawState(...pixels: number[][]) {
-  pixels.forEach(([x, y]) => playgroundState.value[x * sizeY.value + y] = PixelState.line)
+  console.log(pixels)
+  pixels
+    .filter(([x, y]) => x < sizeX.value && y < sizeY.value && x >= 0 && y >= 0)
+    .forEach(([x, y]) => playgroundState.value[x * sizeY.value + y] = PixelState.line)
 }
 
 export async function drawStateWithInterval(
