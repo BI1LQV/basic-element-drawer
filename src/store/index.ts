@@ -1,6 +1,6 @@
 import { ref, watch } from "vue"
 import { PixelState } from "@/model"
-import { fill, is2DArray, pixelToIdx, sleep } from "@/utils"
+import { fill, is2DArray, sleep } from "@/utils"
 export const sizeX = ref(60)
 export const sizeY = ref(60)
 
@@ -25,6 +25,10 @@ export const requestPoint = () => new Promise<number[]>((resolve) => {
     resolve(clickedPoint.value.split("_").map(i => Number(i)))
   })
 })
+
+export function stopRequestPoint() {
+  allowClick.value = false
+}
 
 export function drawState(...pixels: number[][]) {
   pixels

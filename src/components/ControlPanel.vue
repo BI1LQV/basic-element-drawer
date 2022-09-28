@@ -2,6 +2,7 @@
 import DrawLine from "./DrawLine.vue"
 import DrawCirc from "./DrawCirc.vue"
 import DrawEclipse from "./DrawEclipse.vue"
+import DrawPoly from "./DrawPoly.vue"
 </script>
 
 <template>
@@ -23,6 +24,12 @@ import DrawEclipse from "./DrawEclipse.vue"
         <span>画椭圆</span>
       </template>
       <DrawEclipse></DrawEclipse>
+    </el-sub-menu>
+    <el-sub-menu index="4">
+      <template #title>
+        <span>画多边形</span>
+      </template>
+      <DrawPoly></DrawPoly>
     </el-sub-menu>
   </el-menu>
 </template>

@@ -40,7 +40,10 @@ function drawPixel(x: number, y: number) {
       <div
         v-for="y of sizeY" :key="y"
         flex-grow m="0.1"
-        :class="STATE_COLOR_MAP[ playgroundState[(x - 1) * sizeY + (y - 1)] ]"
+        :class="[
+          STATE_COLOR_MAP[ playgroundState[(x - 1) * sizeY + (y - 1)] ],
+          allowClick ? 'cursor-pointer' : '',
+        ]"
         @click="drawPixel(x - 1, y - 1)"
       ></div>
     </div>
