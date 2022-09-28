@@ -36,12 +36,18 @@ export function drawState(...pixels: number[][]) {
     .forEach(([x, y]) => playgroundState.value[x * sizeY.value + y] = PixelState.line)
 }
 
+export function fillState(pos: number[]) {
+  pos.forEach(i => playgroundState.value[i] = PixelState.fill)
+}
+
 export async function drawStateWithInterval(
   pixels: Iterable<number[][]> | Iterable<number[]>,
-  interval: number,
+  interval: number, isFill = false,
 ) {
   for (const maybeGroup of pixels) {
-    if (is2DArray(maybeGroup)) {
+    if (isFill) {
+      fillState(maybeGroup as number[])
+    } else if (is2DArray(maybeGroup)) {
       drawState(...maybeGroup)
     } else {
       drawState(maybeGroup)
@@ -52,7 +58,7 @@ export async function drawStateWithInterval(
 
 export function fillPlayground() {
   drawStateWithInterval(
-    fill(playgroundState.value, sizeX.value, sizeY.value), drawLastTime.value,
-  )
+    fill(playgroundState.value, sizeX.value, sizeY.value),
+    drawLastTime.value / sizeY.value, true)
 }
 
