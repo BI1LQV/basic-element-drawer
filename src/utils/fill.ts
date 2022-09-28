@@ -43,6 +43,13 @@ export function* fill(
         x1Moving = true
       }
     }
+    // let thisLine = getThisLine(playground, maxX, y)
+    // for (let i = 0; i < thisLine.length - 1; i++) {
+    //   if (thisLine[i] === thisLine[i + 1]) { thisLine.splice(i, 1) }
+    // }
+    // if (thisLine.length === 2) {
+    //   res = []
+    // }
     yield res
   }
 }
