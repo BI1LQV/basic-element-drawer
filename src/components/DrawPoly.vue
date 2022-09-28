@@ -16,7 +16,7 @@ watch(drawing, async () => {
     let nextPoint = await requestPoint()
     if (prePoint) {
       const pixels = DDALine(prePoint[0], prePoint[1], nextPoint[0], nextPoint[1])
-      drawStateWithInterval(pixels, 200)
+      drawStateWithInterval(pixels, 50)
     }
 
     prePoint = nextPoint
