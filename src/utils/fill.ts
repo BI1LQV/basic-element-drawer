@@ -29,7 +29,7 @@ export function* fill(
           x1++
         }
         x1++
-        x1Draw = true
+        x1Draw = !x1Draw
         x1Moving = false
       } else {
         while (playground[x2 + y * maxX] !== PixelState.line && x1 <= x2) {
@@ -39,7 +39,7 @@ export function* fill(
           x2--
         }
         x2--
-        x2Draw = true
+        x2Draw = !x2Draw
         x1Moving = true
       }
     }
