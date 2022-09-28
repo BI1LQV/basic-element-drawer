@@ -11,7 +11,7 @@ let form = reactive({
   rY: 5,
 })
 async function drawEclipse() {
-  initPlayground()
+  // initPlayground()
   const { startX, startY, rX, rY } = form
   drawStateWithInterval(centerEclipse(startX, startY, rX, rY), drawLastTime.value / 4)
 }

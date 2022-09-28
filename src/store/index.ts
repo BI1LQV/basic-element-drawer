@@ -47,3 +47,7 @@ export async function drawStateWithInterval(
   }
 }
 
+export function fillPlayground() {
+
+}
+

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { drawLastTime, initPlayground, sizeX, sizeY } from "@/store"
+import { drawLastTime, fillPlayground, initPlayground, sizeX, sizeY } from "@/store"
 </script>
 
 <template>
@@ -11,18 +11,21 @@ import { drawLastTime, initPlayground, sizeX, sizeY } from "@/store"
     </div>
     <div>
       绘画持续时间(ms):<el-input-number v-model="drawLastTime" m-3 :step="100" :min="0"></el-input-number>
-      <el-button type="danger" @click="initPlayground">清除</el-button>
+      <div inline>
+        <el-button type="danger" @click="initPlayground">清除</el-button>
+        <el-button type="primary" @click="fillPlayground">填充</el-button>
+      </div>
     </div>
   </div>
 </template>
 
 <style>
-    @media screen and (min-width:880px){
+    @media screen and (min-width:920px){
     .controller {
       @apply flex-row
     }
   }
-  @media screen and (max-width:880px){
+  @media screen and (max-width:920px){
     .controller {
       @apply flex-col
     }

@@ -9,7 +9,7 @@ let form = reactive({
   r: 16,
 })
 async function drawCirc() {
-  initPlayground()
+  // initPlayground()
   const { startX, startY, r } = form
   drawStateWithInterval(centerCirc(startX, startY, r), drawLastTime.value / 8)
 }

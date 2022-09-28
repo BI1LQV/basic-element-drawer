@@ -12,7 +12,7 @@ let form = reactive({
   endY: 11,
 })
 function drawLine() {
-  initPlayground()
+  // initPlayground()
   const { startX, startY, endX, endY, algorism } = form
   if (algorism === LineAlgorism.DDA) {
     const pixels = DDALine(startX, startY, endX, endY)
