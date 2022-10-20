@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, reactive, ref, watch } from "vue"
+import { type Ref, computed, reactive, ref, watch } from "vue"
 import { Crop, Rank, RefreshLeft } from "@element-plus/icons-vue"
 import { PixelState } from "@/model"
 import { allowClick, clickedPoint, playgroundState, sizeX, sizeY } from "@/store"
@@ -10,7 +10,11 @@ const STATE_COLOR_MAP = {
   [PixelState.fill]: "bg-yellow-500/50",
   [PixelState.selected]: "bg-blue-500/50",
 }
+const pixels = ref<HTMLElement[]>()
 
+function getPixel({ value: { x, y } }: Ref<{ x: number; y: number }>) {
+  return pixels.value![pixelToIdx(x, y)]
+}
 function drawPixel(x: number, y: number) {
   if (!allowClick.value) { return }
   clickedPoint.value = `${x}_${y}`
@@ -18,22 +22,25 @@ function drawPixel(x: number, y: number) {
 }
 
 const selectStart = ref({ x: -1, y: -1 })
-const selectStartDom = ref<HTMLDivElement>()
 const selectEnd = ref({ x: -1, y: -1 })
-const selectEndDom = ref<HTMLDivElement>()
-function startSelecting(ev: MouseEvent, x: number, y: number) {
+
+const selectCentral = computed(() => {
+  const { x: sx, y: sy } = selectStart.value
+  const { x: ex, y: ey } = selectEnd.value
+  return { x: Math.round((sx + ex) / 2), y: Math.round((sy + ey) / 2) }
+})
+
+function startSelecting(x: number, y: number) {
   selectStart.value = { x, y }
-  selectStartDom.value = ev.target as HTMLDivElement
 }
-function showSelecting(ev: MouseEvent, x: number, y: number) {
+function showSelecting(x: number, y: number) {
   if (selectStart.value.x === -1 && selectStart.value.y === -1) {
     return
   }
   selectEnd.value = { x, y }
-  selectEndDom.value = ev.target as HTMLDivElement
 }
 
-function endSelecting(ev: MouseEvent, x: number, y: number) {
+function endSelecting() {
   selectStart.value = { x: -1, y: -1 }
 }
 const pos = reactive({
@@ -43,13 +50,15 @@ const pos = reactive({
   height: 0,
 })
 watch(selectEnd, () => {
-  const { left, top } = selectStartDom.value!.getBoundingClientRect()
-  const { left: leftEnd, top: topEnd } = selectEndDom.value!.getBoundingClientRect()
+  const { left, top } = getPixel(selectStart).getBoundingClientRect()
+  const {
+    left: leftEnd,
+    top: topEnd, width, height,
+  } = getPixel(selectEnd).getBoundingClientRect()
   pos.left = left
   pos.top = top
-  pos.width = leftEnd - left
-  pos.height = topEnd - top
-  console.log(pos)
+  pos.width = leftEnd - left + width
+  pos.height = topEnd - top + height
 })
 const renderPos = computed(() => {
   return {
@@ -59,6 +68,9 @@ const renderPos = computed(() => {
     height: `${pos.height}px`,
   }
 })
+function rotate(ev: MouseEvent) {
+  console.log(ev)
+}
 </script>
 
 <template>
@@ -66,15 +78,16 @@ const renderPos = computed(() => {
     <div v-for="x of sizeX" :key="x" flex flex-grow flex-row>
       <div
         v-for="y of sizeY" :key="y"
+        ref="pixels"
         flex-grow m="0.1"
         :class="[
           STATE_COLOR_MAP[ playgroundState[(x - 1) * sizeY + (y - 1)] ],
           allowClick ? 'cursor-pointer' : '',
         ]"
         @click="drawPixel(x - 1, y - 1)"
-        @mousedown="startSelecting($event, x - 1, y - 1)"
-        @mouseover="showSelecting($event, x - 1, y - 1)"
-        @mouseup="endSelecting($event, x - 1, y - 1)"
+        @mousedown="startSelecting(x - 1, y - 1)"
+        @mouseover="showSelecting(x - 1, y - 1)"
+        @mouseup="endSelecting()"
       ></div>
     </div>
     <Teleport to="#app">
@@ -82,8 +95,13 @@ const renderPos = computed(() => {
         absolute :style="renderPos"
         border="2px blue-500/50" pointer-events-none
       >
-        <div absolute right-0 bottom-0>
-          <el-icon l-icon :size="20" color="black"><RefreshLeft /></el-icon>
+        <div absolute right-0 bottom--6 pointer-events-initial>
+          <el-icon
+            l-icon :size="20" color="black"
+            @mousedown="rotate"
+          >
+            <RefreshLeft />
+          </el-icon>
           <el-icon :size="20" color="black"><Crop /></el-icon>
           <el-icon><Rank /></el-icon>
         </div>
