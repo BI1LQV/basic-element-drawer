@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { computed, reactive, ref, watch } from "vue"
+import { Crop, Rank, RefreshLeft } from "@element-plus/icons-vue"
 import { PixelState } from "@/model"
 import { allowClick, clickedPoint, playgroundState, sizeX, sizeY } from "@/store"
 import { pixelToIdx } from "@/utils"
@@ -14,10 +16,53 @@ function drawPixel(x: number, y: number) {
   clickedPoint.value = `${x}_${y}`
   playgroundState.value[pixelToIdx(x, y)] = PixelState.selected
 }
+
+const selectStart = ref({ x: -1, y: -1 })
+const selectStartDom = ref<HTMLDivElement>()
+const selectEnd = ref({ x: -1, y: -1 })
+const selectEndDom = ref<HTMLDivElement>()
+function startSelecting(ev: MouseEvent, x: number, y: number) {
+  selectStart.value = { x, y }
+  selectStartDom.value = ev.target as HTMLDivElement
+}
+function showSelecting(ev: MouseEvent, x: number, y: number) {
+  if (selectStart.value.x === -1 && selectStart.value.y === -1) {
+    return
+  }
+  selectEnd.value = { x, y }
+  selectEndDom.value = ev.target as HTMLDivElement
+}
+
+function endSelecting(ev: MouseEvent, x: number, y: number) {
+  selectStart.value = { x: -1, y: -1 }
+}
+const pos = reactive({
+  left: 0,
+  top: 0,
+  width: 0,
+  height: 0,
+})
+watch(selectEnd, () => {
+  const { left, top } = selectStartDom.value!.getBoundingClientRect()
+  const { left: leftEnd, top: topEnd } = selectEndDom.value!.getBoundingClientRect()
+  pos.left = left
+  pos.top = top
+  pos.width = leftEnd - left
+  pos.height = topEnd - top
+  console.log(pos)
+})
+const renderPos = computed(() => {
+  return {
+    left: `${pos.left}px`,
+    top: `${pos.top}px`,
+    width: `${pos.width}px`,
+    height: `${pos.height}px`,
+  }
+})
 </script>
 
 <template>
-  <div flex flex-col>
+  <div flex flex-col select-none>
     <div v-for="x of sizeX" :key="x" flex flex-grow flex-row>
       <div
         v-for="y of sizeY" :key="y"
@@ -27,7 +72,22 @@ function drawPixel(x: number, y: number) {
           allowClick ? 'cursor-pointer' : '',
         ]"
         @click="drawPixel(x - 1, y - 1)"
+        @mousedown="startSelecting($event, x - 1, y - 1)"
+        @mouseover="showSelecting($event, x - 1, y - 1)"
+        @mouseup="endSelecting($event, x - 1, y - 1)"
       ></div>
     </div>
+    <Teleport to="#app">
+      <div
+        absolute :style="renderPos"
+        border="2px blue-500/50" pointer-events-none
+      >
+        <div absolute right-0 bottom-0>
+          <el-icon l-icon :size="20" color="black"><RefreshLeft /></el-icon>
+          <el-icon :size="20" color="black"><Crop /></el-icon>
+          <el-icon><Rank /></el-icon>
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>
