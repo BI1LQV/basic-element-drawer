@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import { type Ref, computed, reactive, ref, watch } from "vue"
-import { Crop, Rank, RefreshLeft } from "@element-plus/icons-vue"
+import { type Ref, computed, ref } from "vue"
+import Selector from "./Selector.vue"
 import { PixelState } from "@/model"
-import { allowClick, clickedPoint, playgroundState, sizeX, sizeY } from "@/store"
+import { InitialMouse, allowClick, clickedPoint, initialMousePos, isInitialMouse, playgroundState, selectEnd, selectStart, sizeX, sizeY } from "@/store"
 import { pixelToIdx } from "@/utils"
 const STATE_COLOR_MAP = {
   [PixelState.empty]: "bg-gray-500/10",
@@ -10,19 +10,35 @@ const STATE_COLOR_MAP = {
   [PixelState.fill]: "bg-yellow-500/50",
   [PixelState.selected]: "bg-blue-500/50",
 }
-const pixels = ref<HTMLElement[]>()
-
+const pixels = ref<HTMLDivElement[]>()
 function getPixel({ value: { x, y } }: Ref<{ x: number; y: number }>) {
   return pixels.value![pixelToIdx(x, y)]
 }
+
 function drawPixel(x: number, y: number) {
   if (!allowClick.value) { return }
   clickedPoint.value = `${x}_${y}`
   playgroundState.value[pixelToIdx(x, y)] = PixelState.selected
 }
 
-const selectStart = ref({ x: -1, y: -1 })
-const selectEnd = ref({ x: -1, y: -1 })
+function startSelecting(x: number, y: number) {
+  selectStart.value = { x, y }
+}
+function showSelecting(x: number, y: number) {
+  if (isInitialMouse(selectStart)) {
+    return
+  }
+  selectEnd.value = { x, y }
+}
+
+function endSelecting() {
+  selectStart.value = InitialMouse()
+}
+
+function endTransform() {
+  initialMousePos.value = InitialMouse()
+  console.log(initialMousePos)
+}
 
 const selectCentral = computed(() => {
   const { x: sx, y: sy } = selectStart.value
@@ -30,51 +46,16 @@ const selectCentral = computed(() => {
   return { x: Math.round((sx + ex) / 2), y: Math.round((sy + ey) / 2) }
 })
 
-function startSelecting(x: number, y: number) {
-  selectStart.value = { x, y }
-}
-function showSelecting(x: number, y: number) {
-  if (selectStart.value.x === -1 && selectStart.value.y === -1) {
-    return
-  }
-  selectEnd.value = { x, y }
-}
-
-function endSelecting() {
-  selectStart.value = { x: -1, y: -1 }
-}
-const pos = reactive({
-  left: 0,
-  top: 0,
-  width: 0,
-  height: 0,
-})
-watch(selectEnd, () => {
-  const { left, top } = getPixel(selectStart).getBoundingClientRect()
-  const {
-    left: leftEnd,
-    top: topEnd, width, height,
-  } = getPixel(selectEnd).getBoundingClientRect()
-  pos.left = left
-  pos.top = top
-  pos.width = leftEnd - left + width
-  pos.height = topEnd - top + height
-})
-const renderPos = computed(() => {
-  return {
-    left: `${pos.left}px`,
-    top: `${pos.top}px`,
-    width: `${pos.width}px`,
-    height: `${pos.height}px`,
-  }
-})
 function rotate(ev: MouseEvent) {
-  console.log(ev)
+  if (isInitialMouse(initialMousePos)) { return }
+  const { clientX: mouseX, clientX: mouseY } = ev
+  const { left, top, width, height } = getPixel(selectCentral).getBoundingClientRect()
+  const centerPixel = { x: left + width / 2, y: top + height / 2 }
 }
 </script>
 
 <template>
-  <div flex flex-col select-none>
+  <div flex flex-col select-none @mouseup="endTransform">
     <div v-for="x of sizeX" :key="x" flex flex-grow flex-row>
       <div
         v-for="y of sizeY" :key="y"
@@ -90,22 +71,6 @@ function rotate(ev: MouseEvent) {
         @mouseup="endSelecting()"
       ></div>
     </div>
-    <Teleport to="#app">
-      <div
-        absolute :style="renderPos"
-        border="2px blue-500/50" pointer-events-none
-      >
-        <div absolute right-0 bottom--6 pointer-events-initial>
-          <el-icon
-            l-icon :size="20" color="black"
-            @mousedown="rotate"
-          >
-            <RefreshLeft />
-          </el-icon>
-          <el-icon :size="20" color="black"><Crop /></el-icon>
-          <el-icon><Rank /></el-icon>
-        </div>
-      </div>
-    </Teleport>
+    <Selector :get-pixel="getPixel"></Selector>
   </div>
 </template>
