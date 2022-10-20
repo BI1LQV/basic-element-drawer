@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { type Ref, computed, ref } from "vue"
+import { dot, norm } from "mathjs"
 import Selector from "./Selector.vue"
 import { PixelState } from "@/model"
 import { InitialMouse, allowClick, clickedPoint, initialMousePos, isInitialMouse, playgroundState, selectEnd, selectStart, sizeX, sizeY } from "@/store"
@@ -37,7 +38,6 @@ function endSelecting() {
 
 function endTransform() {
   initialMousePos.value = InitialMouse()
-  console.log(initialMousePos)
 }
 
 const selectCentral = computed(() => {
@@ -48,14 +48,21 @@ const selectCentral = computed(() => {
 
 function rotate(ev: MouseEvent) {
   if (isInitialMouse(initialMousePos)) { return }
-  const { clientX: mouseX, clientX: mouseY } = ev
+  const { clientX, clientY } = ev
   const { left, top, width, height } = getPixel(selectCentral).getBoundingClientRect()
   const centerPixel = { x: left + width / 2, y: top + height / 2 }
+  const initialVector = [initialMousePos.value.x - centerPixel.x, initialMousePos.value.y - centerPixel.y]
+  const nowVector = [clientX - centerPixel.x, clientY - centerPixel.y]
+
+  const angle = Math.acos(dot(initialVector, nowVector)
+  // @ts-expect-error
+   / (norm(initialVector, 2) * norm(nowVector, 2)))
+  console.log("angle", angle)
 }
 </script>
 
 <template>
-  <div flex flex-col select-none @mouseup="endTransform">
+  <div flex flex-col select-none @mouseup="endTransform" @mousemove="rotate">
     <div v-for="x of sizeX" :key="x" flex flex-grow flex-row>
       <div
         v-for="y of sizeY" :key="y"
