@@ -50,3 +50,5 @@ export function useXY(pos: Ref<Pos>, withPx = false) {
 export function isLegal(x: number, y: number) {
   return x < sizeX.value && y < sizeY.value && x >= 0 && y >= 0
 }
+
+export const xyToId = (x: number, y: number) => `pixels_${x}_${y}`

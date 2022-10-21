@@ -13,14 +13,14 @@ import {
   stopTransform,
   transformType,
 } from "@/store"
-import { move, pixelToIdx, resize, rotate } from "@/utils"
+import { move, pixelToIdx, resize, rotate, xyToId } from "@/utils"
 const STATE_COLOR_MAP = {
   [PixelState.empty]: "bg-gray-500/10",
   [PixelState.line]: "bg-gray-500/90",
   [PixelState.fill]: "bg-yellow-500/50",
   [PixelState.selected]: "bg-blue-500/50",
 }
-const xyToId = (x: number, y: number) => `pixels_${x}_${y}`
+
 const isSelecting = ref(false)
 function getPixel({ value: { x, y } }: Ref<Pos>) {
   return document.getElementById(xyToId(x, y))!
@@ -82,7 +82,7 @@ function transformPatcher({ clientX, clientY }: MouseEvent) {
   <div flex flex-col select-none @mouseup="endTransform" @mousemove="transformPatcher">
     <div v-for="x of sizeX" :key="x" flex flex-grow flex-row>
       <div
-        v-for="y of sizeY" :id="xyToId(x, y)"
+        v-for="y of sizeY" :id="xyToId(x - 1, y - 1)"
         :key="y"
         flex-grow m="0.1"
         :class="[
