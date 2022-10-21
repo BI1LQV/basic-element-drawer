@@ -1,6 +1,6 @@
 import { type Ref, computed, ref, watch } from "vue"
 import { PixelState, type Pos } from "@/model"
-import { fill, is2DArray, isLegal, movePixel, pixelToIdx, resizePixel, rotatePixel, sleep, xyToId } from "@/utils"
+import { fill, idxToPixel, is2DArray, isLegal, movePixel, pixelToIdx, resizePixel, rotatePixel, sleep, xyToId } from "@/utils"
 export const sizeX = ref(60)
 export const sizeY = ref(60)
 
@@ -123,11 +123,13 @@ export const selectCentral = computed(() => {
 })
 
 export function snapshotPlayground() {
-  const shadowStart = pixelToIdx(selectStart.value.x, selectStart.value.y)
-  const shadowEnd = pixelToIdx(selectEnd.value.x, selectEnd.value.y)
   const toTransform: [number, PixelState][] = []
   const snapshot = playgroundState.value.map((state, idx) => {
-    if (idx >= shadowStart && idx <= shadowEnd) {
+    const [ix, iy] = idxToPixel(idx)
+    if (
+      ix > selectStart.value.x && ix < selectEnd.value.x
+      && iy > selectStart.value.y && iy < selectEnd.value.y
+    ) {
       if (state === PixelState.fill || state === PixelState.line) {
         toTransform.push([idx, state])
       }
