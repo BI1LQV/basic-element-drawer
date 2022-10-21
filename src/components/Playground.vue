@@ -20,10 +20,10 @@ const STATE_COLOR_MAP = {
   [PixelState.fill]: "bg-yellow-500/50",
   [PixelState.selected]: "bg-blue-500/50",
 }
-const pixels = ref<HTMLDivElement[]>()
+const xyToId = (x: number, y: number) => `pixels_${x}_${y}`
 const isSelecting = ref(false)
 function getPixel({ value: { x, y } }: Ref<Pos>) {
-  return pixels.value![pixelToIdx(x, y)]
+  return document.getElementById(xyToId(x, y))!
 }
 
 function drawPixel(x: number, y: number) {
@@ -82,8 +82,8 @@ function transformPatcher({ clientX, clientY }: MouseEvent) {
   <div flex flex-col select-none @mouseup="endTransform" @mousemove="transformPatcher">
     <div v-for="x of sizeX" :key="x" flex flex-grow flex-row>
       <div
-        v-for="y of sizeY" :key="y"
-        ref="pixels"
+        v-for="y of sizeY" :id="xyToId(x, y)"
+        :key="y"
         flex-grow m="0.1"
         :class="[
           STATE_COLOR_MAP[ playgroundState[(x - 1) * sizeY + (y - 1)] ],

@@ -4,7 +4,7 @@ import { type Ref, reactive, watch } from "vue"
 import { initialMousePos, isInitialMouse, moveDiff, resizeDiff, rotateAngle, selectEnd, selectStart, transformType } from "@/store"
 import { usePx, useRad, useXY } from "@/utils"
 const { getPixel } = defineProps<{
-  getPixel: ({ value: { x, y } }: Ref<{ x: number; y: number }>) => HTMLDivElement
+  getPixel: ({ value: { x, y } }: Ref<{ x: number; y: number }>) => HTMLElement
 }>()
 
 const selectorPos = reactive({
