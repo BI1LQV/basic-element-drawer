@@ -128,17 +128,26 @@ export function snapshotPlayground() {
 }
 
 export const stopTransform = ref(() => {})
+const WATCH_MAP = {
+  "rotate": rotateAngle,
+  "move": moveDiff,
+  "resize": resizeDiff,
+}
+
 watch(transformType, (newVal, oldVal) => {
   if (!(!oldVal && newVal)) {
     return
   }
   // 新transformType，开始transform
   const { snapshot, toTransform } = snapshotPlayground()
-  stopTransform.value = watch(rotateAngle, () => {
-    playgroundState.value = [...snapshot]
-    // console.log(rotatePixel(toTransform, rotateAngle.value))
-    rotatePixel(toTransform, selectCentral.value, rotateAngle.value).forEach(([idx, state]) => {
-      playgroundState.value[idx] = state
+  stopTransform.value = watch(WATCH_MAP[newVal], () => {
+    setTimeout(() => {
+      playgroundState.value = [...snapshot]
+      if (newVal === "rotate") {
+        rotatePixel(toTransform, selectCentral.value, rotateAngle.value).forEach(([idx, state]) => {
+          playgroundState.value[idx] = state
+        })
+      } else if (newVal === "move") {}
     })
   })
 })

@@ -31,11 +31,14 @@ const ROTATE_MAT = (theta: number) => [
 ]
 
 export function rotatePixel(toTransform: [number, PixelState][], { x: cX, y: cY }: Record<"x" | "y", number>, theta: number) {
+  const m1 = TRANSLATE_MAT(-cX, -cY)
+  const m2 = ROTATE_MAT(-theta)
+  const m3 = TRANSLATE_MAT(cX, cY)
   return toTransform.map(([idx, state]) => {
     const p0 = [...idxToPixel(idx), 1]// 原来的点
-    const p1 = multiply(TRANSLATE_MAT(-cX, -cY), p0)// 平移到原点
-    const p2 = multiply(ROTATE_MAT(-theta), p1) // 旋转
-    const p3 = multiply(TRANSLATE_MAT(cX, cY), p2) as number[]// 转回去
+    const p1 = multiply(m1, p0)// 平移到原点
+    const p2 = multiply(m2, p1) // 旋转
+    const p3 = multiply(m3, p2) as number[]// 转回去
     const x = round(p3[0])
     const y = round(p3[1])
     if (isLegal(x, y)) {
