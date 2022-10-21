@@ -37,7 +37,7 @@ const renderedScale = useXY(resizeDiff)
 const renderedTranslate = useXY(moveDiff, true)
 
 function setInitial(ev: MouseEvent, type: "rotate" | "resize" | "move") {
-  if (transformType.value) { return }
+  if (transformType.value && transformType.value !== type) { return }
   initialMousePos.value = { x: ev.clientX, y: ev.clientY }
   transformType.value = type
 }
