@@ -1,5 +1,5 @@
 import type { Pos } from "@/model"
-import { inheritMoveDiff, inheritRotateAngle, moveDiff, resizeDiff, rotateAngle } from "@/store"
+import { inheritMoveDiff, inheritResizeDiff, inheritRotateAngle, moveDiff, resizeDiff, rotateAngle } from "@/store"
 
 export function rotate(init: Pos, now: Pos) {
   const initialAngle = Math.atan2(init.y, init.x)
@@ -8,7 +8,7 @@ export function rotate(init: Pos, now: Pos) {
 }
 
 export function resize(init: Pos, now: Pos) {
-  resizeDiff.value = { x: now.x / init.x, y: now.y / init.y }
+  resizeDiff.value = { x: now.x / init.x * inheritResizeDiff.value.x, y: now.y / init.y * inheritResizeDiff.value.y }
 }
 
 export function move(init: Pos, now: Pos) {
