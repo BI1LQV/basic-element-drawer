@@ -110,6 +110,12 @@ export function clearInherit() {
   transformType.value = undefined
 }
 
+export function clearDiff() {
+  rotateAngle.value = 0
+  moveDiff.value = { x: 0, y: 0 }
+  resizeDiff.value = { x: 1, y: 1 }
+}
+
 export function inheritThree() {
   inheritRotateAngle.value = rotateAngle.value
   inheritMoveDiff.value = moveDiff.value
