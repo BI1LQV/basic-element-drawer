@@ -81,7 +81,10 @@ export const initialMousePos = ref(InitialMouse())
 export const rotateAngle = ref(0)
 export const moveDiff = ref({ x: 0, y: 0 })
 export const resizeDiff = ref({ x: 1, y: 1 })
-
+export const transformType = ref<"rotate" | "resize" | "move">()
+export const inheritRotateAngle = ref(0)
+export const inheritMoveDiff = ref({ x: 0, y: 0 })
+export const inheritResizeDiff = ref({ x: 1, y: 1 })
 export function clearSelectStatus() {
   rotateAngle.value = 0
   selectEnd.value = InitialMouse()
@@ -89,7 +92,17 @@ export function clearSelectStatus() {
   moveDiff.value = { x: 0, y: 0 }
 }
 
-export const transformType = ref<"rotate" | "resize" | "move">()
+export function clearInherit() {
+  inheritRotateAngle.value = 0
+  inheritMoveDiff.value = { x: 0, y: 0 }
+  inheritResizeDiff.value = { x: 1, y: 1 }
+}
+
+export function inheritThree() {
+  inheritRotateAngle.value = rotateAngle.value
+  inheritMoveDiff.value = moveDiff.value
+  inheritResizeDiff.value = resizeDiff.value
+}
 
 export const selectCentral = computed(() => {
   const { x: sx, y: sy } = selectStart.value

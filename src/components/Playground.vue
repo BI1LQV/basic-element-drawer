@@ -4,11 +4,13 @@ import Selector from "./Selector.vue"
 import { PixelState, type Pos } from "@/model"
 import {
   InitialMouse, allowClick,
-  clearSelectStatus, clickedPoint,
-  initialMousePos,
-  isInitialMouse,
-  playgroundState, selectCentral,
-  selectEnd, selectStart, sizeX, sizeY, transformType,
+  clearInherit, clearSelectStatus,
+  clickedPoint,
+  inheritThree,
+  initialMousePos, isInitialMouse,
+  playgroundState, selectCentral, selectEnd, selectStart, sizeX,
+  sizeY,
+  transformType,
 } from "@/store"
 import { move, pixelToIdx, resize, rotate } from "@/utils"
 const STATE_COLOR_MAP = {
@@ -33,6 +35,7 @@ function startSelecting(x: number, y: number) {
   selectStart.value = { x, y }
   isSelecting.value = true
   clearSelectStatus()
+  clearInherit()
 }
 function showSelecting(x: number, y: number) {
   if (!isSelecting.value) { return }
@@ -45,6 +48,18 @@ function endSelecting() {
 
 function endTransform() {
   initialMousePos.value = InitialMouse()
+  inheritThree()
+  // if (transformType.value === "move") {
+  //   selectStart.value = {
+  //     x: selectStart.value.x + moveDiff.value.x,
+  //     y: selectStart.value.y + moveDiff.value.y,
+  //   }
+  //   selectEnd.value = {
+  //     x: selectEnd.value.x + moveDiff.value.x,
+  //     y: selectEnd.value.y + moveDiff.value.y,
+  //   }
+  //   moveDiff.value = { x: 0, y: 0 }
+  // }
 }
 
 function transformPatcher({ clientX, clientY }: MouseEvent) {
