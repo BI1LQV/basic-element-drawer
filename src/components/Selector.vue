@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { Crop, Rank, RefreshLeft } from "@element-plus/icons-vue"
-import { type Ref, computed, reactive, watch } from "vue"
-import { initialMousePos, isInitialMouse, resizeDiff, rotateAngle, selectEnd, selectStart, transformType } from "@/store"
-import { usePx, useRad } from "@/utils"
+import { type Ref, reactive, watch } from "vue"
+import { initialMousePos, isInitialMouse, moveDiff, resizeDiff, rotateAngle, selectEnd, selectStart, transformType } from "@/store"
+import { usePx, useRad, useXY } from "@/utils"
 const { getPixel } = defineProps<{
   getPixel: ({ value: { x, y } }: Ref<{ x: number; y: number }>) => HTMLDivElement
 }>()
@@ -33,7 +33,9 @@ watch(selectEnd, () => {
 })
 const renderedPos = usePx(selectorPos)
 const renderedRotate = useRad(rotateAngle)
-const renderedScale = computed(() => `${resizeDiff.value.x} ,${resizeDiff.value.y}`)
+const renderedScale = useXY(resizeDiff)
+const renderedTranslate = useXY(moveDiff, true)
+
 function setInitial(ev: MouseEvent, type: "rotate" | "resize" | "move") {
   initialMousePos.value = { x: ev.clientX, y: ev.clientY }
   transformType.value = type
@@ -68,6 +70,6 @@ function setInitial(ev: MouseEvent, type: "rotate" | "resize" | "move") {
 
 <style>
 #selector {
-  transform: rotate(v-bind(renderedRotate)) scale(v-bind(renderedScale));
+  transform: rotate(v-bind(renderedRotate)) scale(v-bind(renderedScale)) translate(v-bind(renderedTranslate));
 }
 </style>

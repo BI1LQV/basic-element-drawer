@@ -64,8 +64,10 @@ function transformPatcher({ clientX, clientY }: MouseEvent) {
     rotate(centerToInit, centerToNow)
   } else if (transformType.value === "resize") {
     resize(centerToInit, centerToNow)
+  } else if (transformType.value === "move") {
+    move(centerToInit, centerToNow)
   } else {
-    const p: never = transformType.value
+    const no: never = transformType.value
   }
 }
 </script>

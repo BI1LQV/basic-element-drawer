@@ -10,3 +10,7 @@ export function rotate(init: Pos, now: Pos) {
 export function resize(init: Pos, now: Pos) {
   resizeDiff.value = { x: now.x / init.x, y: now.y / init.y }
 }
+
+export function move(init: Pos, now: Pos) {
+  moveDiff.value = { x: now.x - init.x, y: now.y - init.y }
+}
