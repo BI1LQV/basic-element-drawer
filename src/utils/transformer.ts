@@ -30,20 +30,30 @@ const ROTATE_MAT = (theta: number) => [
   [0, 0, 1],
 ]
 
-export function rotatePixel(toTransform: [number, PixelState][], { x: cX, y: cY }: Record<"x" | "y", number>, theta: number) {
-  const m1 = TRANSLATE_MAT(-cX, -cY)
-  const m2 = ROTATE_MAT(-theta)
-  const m3 = TRANSLATE_MAT(cX, cY)
+function matrixChainMul(toTransform: [number, PixelState][], ...matrixs: number[][][]) {
+  const finalMat = matrixs.reduce((pre, cur) => multiply(cur, pre) as number[][], [
+    [1, 0, 0],
+    [0, 1, 0],
+    [0, 0, 1],
+  ])
   return toTransform.map(([idx, state]) => {
-    const p0 = [...idxToPixel(idx), 1]// 原来的点
-    const p1 = multiply(m1, p0)// 平移到原点
-    const p2 = multiply(m2, p1) // 旋转
-    const p3 = multiply(m3, p2) as number[]// 转回去
-    const x = round(p3[0])
-    const y = round(p3[1])
+    const p = multiply(finalMat, [...idxToPixel(idx), 1]) as number[]
+    const x = round(p[0])
+    const y = round(p[1])
     if (isLegal(x, y)) {
       return [pixelToIdx(x, y), state]
     }
     return undefined
   }).filter(Boolean) as number[][]
 }
+
+export function rotatePixel(
+  toTransform: [number, PixelState][],
+  { x: cX, y: cY }: Record<"x" | "y", number>,
+  theta: number) {
+  const m1 = TRANSLATE_MAT(-cX, -cY)// 平移到原点
+  const m2 = ROTATE_MAT(-theta)// 旋转
+  const m3 = TRANSLATE_MAT(cX, cY)// 转回去
+  return matrixChainMul(toTransform, m1, m2, m3)
+}
+
