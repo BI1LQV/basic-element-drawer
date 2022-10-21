@@ -37,6 +37,7 @@ const renderedScale = useXY(resizeDiff)
 const renderedTranslate = useXY(moveDiff, true)
 
 function setInitial(ev: MouseEvent, type: "rotate" | "resize" | "move") {
+  if (transformType.value) { return }
   initialMousePos.value = { x: ev.clientX, y: ev.clientY }
   transformType.value = type
 }
@@ -50,16 +51,19 @@ function setInitial(ev: MouseEvent, type: "rotate" | "resize" | "move") {
   >
     <div absolute right-0 bottom--6 pointer-events-initial>
       <el-icon
+        :color="transformType === 'rotate' ? 'blue' : 'gray'"
         @mousedown="setInitial($event, 'rotate')"
       >
         <RefreshLeft />
       </el-icon>
       <el-icon
+        :color="transformType === 'resize' ? 'blue' : 'gray'"
         @mousedown="setInitial($event, 'resize')"
       >
         <Crop />
       </el-icon>
       <el-icon
+        :color="transformType === 'move' ? 'blue' : 'gray'"
         @mousedown="setInitial($event, 'move')"
       >
         <Rank />
