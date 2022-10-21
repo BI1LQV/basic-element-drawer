@@ -146,11 +146,23 @@ const WATCH_MAP = {
   "move": moveDiff,
   "resize": resizeDiff,
 }
+export function getBlockDiff() {
+  const blockDiff = { ...moveDiff.value }
+  const pixelDom = document.getElementById(xyToId(0, 0))
+  if (pixelDom) {
+    const { margin, width, height } = getComputedStyle(pixelDom)
+    blockDiff.x /= parseFloat(margin) + parseFloat(width)
+    blockDiff.y /= parseFloat(margin) + parseFloat(height)
+    return blockDiff
+  }
+}
 
 watch(transformType, (newVal, oldVal) => {
-  if (!(!oldVal && newVal)) {
-    return
-  }
+  if (!newVal) { return }
+  // if (!(!oldVal && newVal)) {
+  //   return
+  // }
+  stopTransform.value()
   // 新transformType，开始transform
   const { snapshot, toTransform } = snapshotPlayground()
   stopTransform.value = watch(WATCH_MAP[newVal], () => {
@@ -160,12 +172,8 @@ watch(transformType, (newVal, oldVal) => {
       if (newVal === "rotate") {
         toDraw = rotatePixel(toTransform, selectCentral.value, rotateAngle.value)
       } else if (newVal === "move") {
-        const blockDiff = { ...moveDiff.value }
-        const pixelDom = document.getElementById(xyToId(0, 0))
-        if (pixelDom) {
-          const { margin, width, height } = getComputedStyle(pixelDom)
-          blockDiff.x /= parseInt(margin) + parseInt(width)
-          blockDiff.y /= parseInt(margin) + parseInt(height)
+        const blockDiff = getBlockDiff()
+        if (blockDiff) {
           toDraw = movePixel(toTransform, blockDiff)
         } else {
           toDraw = []

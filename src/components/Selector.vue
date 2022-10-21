@@ -1,8 +1,9 @@
 <script lang="ts" setup>
 import { Crop, Rank, RefreshLeft } from "@element-plus/icons-vue"
 import { type Ref, computed, reactive, watch } from "vue"
-import { initialMousePos, isInitialMouse, moveDiff, resizeDiff, rotateAngle, selectEnd, selectStart, transformType } from "@/store"
-import { usePx, useRad, useXY } from "@/utils"
+import { getBlockDiff, initialMousePos, isInitialMouse, moveDiff, resizeDiff, rotateAngle, selectEnd, selectStart, transformType } from "@/store"
+import { idxToPixel, movePixel, pixelToIdx, usePx, useRad, useXY } from "@/utils"
+import { PixelState } from "@/model"
 const { getPixel } = defineProps<{
   getPixel: ({ value: { x, y } }: Ref<{ x: number; y: number }>) => HTMLElement
 }>()
@@ -37,7 +38,25 @@ const renderedScale = useXY(resizeDiff)
 const renderedTranslate = useXY(moveDiff, true)
 
 function setInitial(ev: MouseEvent, type: "rotate" | "resize" | "move") {
-  if (transformType.value && transformType.value !== type) { return }
+  if (transformType.value && transformType.value !== type) {
+    // if (transformType.value === "move") {
+    //   const [[newStart, _1], [newEnd, _2]] = movePixel([
+    //     [pixelToIdx(selectStart.value.x, selectStart.value.y), PixelState.selected],
+    //     [pixelToIdx(selectEnd.value.x, selectEnd.value.y), PixelState.selected],
+    //   ], getBlockDiff()!)
+    //   console.log(getBlockDiff())
+    //   const [newStartX, newStartY] = idxToPixel(newStart)
+    //   const [newEndX, newEndY] = idxToPixel(newEnd)
+    //   selectStart.value = { x: newStartX, y: newStartY }
+    //   selectEnd.value = { x: newEndX, y: newEndY }
+    // }
+    // // else if (transformType.value === "resize") {
+
+    // // } else if (transformType.value === "rotate") {
+
+    // // } else { }
+    // return
+  }
   initialMousePos.value = { x: ev.clientX, y: ev.clientY }
   transformType.value = type
 }

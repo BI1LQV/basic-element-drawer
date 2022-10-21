@@ -8,7 +8,7 @@ import {
   clickedPoint,
   inheritThree,
   initialMousePos, isInitialMouse,
-  playgroundState, selectCentral, selectEnd, selectStart, setSelectEnd,
+  playgroundState, selectCentral, selectStart, setSelectEnd,
   sizeX,
   sizeY,
   stopTransform,
