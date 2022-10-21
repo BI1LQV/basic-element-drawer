@@ -46,12 +46,16 @@ export async function drawStateWithInterval(
 ) {
   for (const maybeGroup of pixels) {
     if (isFill) {
+      // 如果是填充 调用fillState
       fillState(maybeGroup as number[])
     } else if (is2DArray(maybeGroup)) {
+      // 如果是一组像素（如画圆的时候每次需要画一组
       drawState(...maybeGroup)
     } else {
+      // 如果是单个像素（如画线每次只画一个点
       drawState(maybeGroup)
     }
+    // 睡眠 等待
     await sleep(interval)
   }
 }
