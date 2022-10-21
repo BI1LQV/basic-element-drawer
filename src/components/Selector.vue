@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { Crop, Rank, RefreshLeft } from "@element-plus/icons-vue"
-import { type Ref, reactive, watch } from "vue"
+import { type Ref, computed, reactive, watch } from "vue"
 import { initialMousePos, isInitialMouse, moveDiff, resizeDiff, rotateAngle, selectEnd, selectStart, transformType } from "@/store"
 import { usePx, useRad, useXY } from "@/utils"
 const { getPixel } = defineProps<{
@@ -41,6 +41,8 @@ function setInitial(ev: MouseEvent, type: "rotate" | "resize" | "move") {
   initialMousePos.value = { x: ev.clientX, y: ev.clientY }
   transformType.value = type
 }
+
+const negativeResizeDiff = computed(() => `${1 / resizeDiff.value.x} ,${1 / resizeDiff.value.y}`)
 </script>
 
 <template>
@@ -49,7 +51,7 @@ function setInitial(ev: MouseEvent, type: "rotate" | "resize" | "move") {
     :style="renderedPos" border="2px blue-500/50"
     pointer-events-none
   >
-    <div absolute right-0 bottom--6 pointer-events-initial>
+    <div id="operator" absolute right-0 bottom--6 pointer-events-initial>
       <el-icon
         :color="transformType === 'rotate' ? 'blue' : 'gray'"
         @mousedown="setInitial($event, 'rotate')"
@@ -75,5 +77,8 @@ function setInitial(ev: MouseEvent, type: "rotate" | "resize" | "move") {
 <style>
 #selector {
   transform: rotate(v-bind(renderedRotate)) scale(v-bind(renderedScale)) translate(v-bind(renderedTranslate));
+}
+#operator{
+  transform: scale(v-bind(negativeResizeDiff));
 }
 </style>
