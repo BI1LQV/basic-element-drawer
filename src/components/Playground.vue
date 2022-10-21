@@ -11,6 +11,7 @@ const STATE_COLOR_MAP = {
   [PixelState.selected]: "bg-blue-500/50",
 }
 const pixels = ref<HTMLDivElement[]>()
+const isSelecting = ref(false)
 function getPixel({ value: { x, y } }: Ref<{ x: number; y: number }>) {
   return pixels.value![pixelToIdx(x, y)]
 }
@@ -23,16 +24,16 @@ function drawPixel(x: number, y: number) {
 
 function startSelecting(x: number, y: number) {
   selectStart.value = { x, y }
+  isSelecting.value = true
+  rotateAngle.value = 0
 }
 function showSelecting(x: number, y: number) {
-  if (isInitialMouse(selectStart)) {
-    return
-  }
+  if (!isSelecting.value) { return }
   selectEnd.value = { x, y }
 }
 
 function endSelecting() {
-  selectStart.value = InitialMouse()
+  isSelecting.value = false
 }
 
 function endTransform() {
