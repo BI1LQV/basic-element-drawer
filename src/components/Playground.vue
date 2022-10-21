@@ -2,7 +2,7 @@
 import { type Ref, computed, ref } from "vue"
 import Selector from "./Selector.vue"
 import { PixelState } from "@/model"
-import { InitialMouse, allowClick, clickedPoint, initialMousePos, isInitialMouse, playgroundState, rotateAngle, selectEnd, selectStart, sizeX, sizeY } from "@/store"
+import { InitialMouse, allowClick, clearSelectStatus, clickedPoint, initialMousePos, isInitialMouse, playgroundState, rotateAngle, selectEnd, selectStart, sizeX, sizeY } from "@/store"
 import { pixelToIdx } from "@/utils"
 const STATE_COLOR_MAP = {
   [PixelState.empty]: "bg-gray-500/10",
@@ -25,7 +25,7 @@ function drawPixel(x: number, y: number) {
 function startSelecting(x: number, y: number) {
   selectStart.value = { x, y }
   isSelecting.value = true
-  rotateAngle.value = 0
+  clearSelectStatus()
 }
 function showSelecting(x: number, y: number) {
   if (!isSelecting.value) { return }

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { Crop, Rank, RefreshLeft } from "@element-plus/icons-vue"
 import { type Ref, reactive, watch } from "vue"
-import { initialMousePos, rotateAngle, selectEnd, selectStart } from "@/store"
+import { initialMousePos, isInitialMouse, rotateAngle, selectEnd, selectStart } from "@/store"
 import { usePx, useRad } from "@/utils"
 const { getPixel } = defineProps<{
   getPixel: ({ value: { x, y } }: Ref<{ x: number; y: number }>) => HTMLDivElement
@@ -14,6 +14,13 @@ const selectorPos = reactive({
   height: 0,
 })
 watch(selectEnd, () => {
+  if (isInitialMouse(selectEnd)) {
+    selectorPos.left = 0
+    selectorPos.top = 0
+    selectorPos.width = 0
+    selectorPos.height = 0
+    return
+  }
   const { left, top } = getPixel(selectStart).getBoundingClientRect()
   const {
     left: leftEnd,
@@ -32,7 +39,6 @@ function setInitial(ev: MouseEvent, type: "rotate") {
 </script>
 
 <template>
-  <!-- <Teleport to="#app"> -->
   <div
     id="selector" absolute
     :style="renderedPos" border="2px blue-500/50"
@@ -49,7 +55,6 @@ function setInitial(ev: MouseEvent, type: "rotate") {
       <el-icon><Rank /></el-icon>
     </div>
   </div>
-  <!-- </Teleport> -->
 </template>
 
 <style>

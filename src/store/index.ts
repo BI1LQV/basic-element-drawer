@@ -80,3 +80,8 @@ export const selectEnd = ref(InitialMouse())
 export const initialMousePos = ref(InitialMouse())
 
 export const rotateAngle = ref(0)
+
+export function clearSelectStatus() {
+  rotateAngle.value = 0
+  selectEnd.value = InitialMouse()
+}
