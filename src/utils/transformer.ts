@@ -57,3 +57,9 @@ export function rotatePixel(
   return matrixChainMul(toTransform, m1, m2, m3)
 }
 
+export function movePixel(
+  toTransform: [number, PixelState][],
+  { x: tx, y: ty }: Pos) {
+  const m = TRANSLATE_MAT(ty, tx)// 平移
+  return matrixChainMul(toTransform, m)
+}
