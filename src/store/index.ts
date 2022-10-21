@@ -1,6 +1,6 @@
 import { type Ref, computed, ref, watch } from "vue"
 import { PixelState, type Pos } from "@/model"
-import { fill, is2DArray, isLegal, movePixel, pixelToIdx, rotatePixel, sleep, xyToId } from "@/utils"
+import { fill, is2DArray, isLegal, movePixel, pixelToIdx, resizePixel, rotatePixel, sleep, xyToId } from "@/utils"
 export const sizeX = ref(60)
 export const sizeY = ref(60)
 
@@ -143,10 +143,9 @@ watch(transformType, (newVal, oldVal) => {
   stopTransform.value = watch(WATCH_MAP[newVal], () => {
     setTimeout(() => {
       playgroundState.value = [...snapshot]
+      let toDraw: number[][]
       if (newVal === "rotate") {
-        rotatePixel(toTransform, selectCentral.value, rotateAngle.value).forEach(([idx, state]) => {
-          playgroundState.value[idx] = state
-        })
+        toDraw = rotatePixel(toTransform, selectCentral.value, rotateAngle.value)
       } else if (newVal === "move") {
         const blockDiff = { ...moveDiff.value }
         const pixelDom = document.getElementById(xyToId(0, 0))
@@ -154,11 +153,19 @@ watch(transformType, (newVal, oldVal) => {
           const { margin, width, height } = getComputedStyle(pixelDom)
           blockDiff.x /= parseInt(margin) + parseInt(width)
           blockDiff.y /= parseInt(margin) + parseInt(height)
-          movePixel(toTransform, blockDiff).forEach(([idx, state]) => {
-            playgroundState.value[idx] = state
-          })
+          toDraw = movePixel(toTransform, blockDiff)
+        } else {
+          toDraw = []
         }
+      } else if ((newVal === "resize")) {
+        toDraw = resizePixel(toTransform, selectCentral.value, resizeDiff.value)
+      } else {
+        const n: never = newVal
+        toDraw = []
       }
+      toDraw.forEach(([idx, state]) => {
+        playgroundState.value[idx] = state
+      })
     })
   })
 })

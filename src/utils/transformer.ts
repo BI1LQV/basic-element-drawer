@@ -30,6 +30,12 @@ const ROTATE_MAT = (theta: number) => [
   [0, 0, 1],
 ]
 
+const RESIZE_MAT = (sx: number, sy: number) => [
+  [sx, 0, 0],
+  [0, sy, 0],
+  [0, 0, 1],
+]
+
 function matrixChainMul(toTransform: [number, PixelState][], ...matrixs: number[][][]) {
   const finalMat = matrixs.reduce((pre, cur) => multiply(cur, pre) as number[][], [
     [1, 0, 0],
@@ -62,4 +68,14 @@ export function movePixel(
   { x: tx, y: ty }: Pos) {
   const m = TRANSLATE_MAT(ty, tx)// 平移
   return matrixChainMul(toTransform, m)
+}
+
+export function resizePixel(
+  toTransform: [number, PixelState][],
+  { x: cX, y: cY }: Record<"x" | "y", number>,
+  { x: sx, y: sy }: Record<"x" | "y", number>) {
+  const m1 = TRANSLATE_MAT(-cX, -cY)// 平移到原点
+  const m2 = RESIZE_MAT(sy, sx)// 旋转
+  const m3 = TRANSLATE_MAT(cX, cY)// 转回去
+  return matrixChainMul(toTransform, m1, m2, m3)
 }
