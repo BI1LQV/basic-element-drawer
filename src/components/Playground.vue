@@ -10,6 +10,7 @@ import {
   initialMousePos, isInitialMouse,
   playgroundState, selectCentral, selectEnd, selectStart, sizeX,
   sizeY,
+  stopTransform,
   transformType,
 } from "@/store"
 import { move, pixelToIdx, resize, rotate } from "@/utils"
@@ -36,6 +37,7 @@ function startSelecting(x: number, y: number) {
   isSelecting.value = true
   clearSelectStatus()
   clearInherit()
+  stopTransform.value()
 }
 function showSelecting(x: number, y: number) {
   if (!isSelecting.value) { return }
@@ -49,17 +51,6 @@ function endSelecting() {
 function endTransform() {
   initialMousePos.value = InitialMouse()
   inheritThree()
-  // if (transformType.value === "move") {
-  //   selectStart.value = {
-  //     x: selectStart.value.x + moveDiff.value.x,
-  //     y: selectStart.value.y + moveDiff.value.y,
-  //   }
-  //   selectEnd.value = {
-  //     x: selectEnd.value.x + moveDiff.value.x,
-  //     y: selectEnd.value.y + moveDiff.value.y,
-  //   }
-  //   moveDiff.value = { x: 0, y: 0 }
-  // }
 }
 
 function transformPatcher({ clientX, clientY }: MouseEvent) {

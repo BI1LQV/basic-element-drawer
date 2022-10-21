@@ -1,8 +1,14 @@
 import { type Ref, computed } from "vue"
-import { sizeY } from "@/store"
+import { sizeX, sizeY } from "@/store"
 import type { Pos } from "@/model"
 export function pixelToIdx(x: number, y: number) {
   return x * sizeY.value + y
+}
+
+export function idxToPixel(idx: number) {
+  const y = idx % sizeY.value
+  const x = (idx - y) / sizeY.value
+  return [x, y]
 }
 
 export function sleep(ms: number) {
@@ -40,4 +46,7 @@ export function useXY(pos: Ref<Pos>, withPx = false) {
     return computed(() => `${pos.value.x}px ,${pos.value.y}px`)
   }
   return computed(() => `${pos.value.x} ,${pos.value.y}`)
+}
+export function isLegal(x: number, y: number) {
+  return x < sizeX.value && y < sizeY.value && x >= 0 && y >= 0
 }

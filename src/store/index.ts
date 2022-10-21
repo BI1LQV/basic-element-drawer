@@ -1,6 +1,6 @@
 import { type Ref, computed, ref, watch } from "vue"
 import { PixelState, type Pos } from "@/model"
-import { fill, is2DArray, sleep } from "@/utils"
+import { fill, is2DArray, isLegal, pixelToIdx, rotatePixel, sleep } from "@/utils"
 export const sizeX = ref(60)
 export const sizeY = ref(60)
 
@@ -32,7 +32,7 @@ export function stopRequestPoint() {
 
 export function drawState(...pixels: number[][]) {
   pixels
-    .filter(([x, y]) => x < sizeX.value && y < sizeY.value && x >= 0 && y >= 0)
+    .filter(([x, y]) => isLegal(x, y))
     .forEach(([x, y]) => playgroundState.value[x * sizeY.value + y] = PixelState.line)
 }
 
@@ -111,3 +111,34 @@ export const selectCentral = computed(() => {
   return { x: Math.round((sx + ex) / 2), y: Math.round((sy + ey) / 2) }
 })
 
+export function snapshotPlayground() {
+  const shadowStart = pixelToIdx(selectStart.value.x, selectStart.value.y)
+  const shadowEnd = pixelToIdx(selectEnd.value.x, selectEnd.value.y)
+  const toTransform: [number, PixelState][] = []
+  const snapshot = playgroundState.value.map((state, idx) => {
+    if (idx >= shadowStart && idx <= shadowEnd) {
+      if (state === PixelState.fill || state === PixelState.line) {
+        toTransform.push([idx, state])
+      }
+      return PixelState.empty
+    }
+    return state
+  })
+  return { snapshot, toTransform }
+}
+
+export const stopTransform = ref(() => {})
+watch(transformType, (newVal, oldVal) => {
+  if (!(!oldVal && newVal)) {
+    return
+  }
+  // 新transformType，开始transform
+  const { snapshot, toTransform } = snapshotPlayground()
+  stopTransform.value = watch(rotateAngle, () => {
+    playgroundState.value = [...snapshot]
+    // console.log(rotatePixel(toTransform, rotateAngle.value))
+    rotatePixel(toTransform, selectCentral.value, rotateAngle.value).forEach(([idx, state]) => {
+      playgroundState.value[idx] = state
+    })
+  })
+})
