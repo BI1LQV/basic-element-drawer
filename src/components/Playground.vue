@@ -8,7 +8,8 @@ import {
   clickedPoint,
   inheritThree,
   initialMousePos, isInitialMouse,
-  playgroundState, selectCentral, selectEnd, selectStart, sizeX,
+  playgroundState, selectCentral, selectEnd, selectStart, setSelectEnd,
+  sizeX,
   sizeY,
   stopTransform,
   transformType,
@@ -41,7 +42,7 @@ function startSelecting(x: number, y: number) {
 }
 function showSelecting(x: number, y: number) {
   if (!isSelecting.value) { return }
-  selectEnd.value = { x, y }
+  setSelectEnd(x, y)
 }
 
 function endSelecting() {

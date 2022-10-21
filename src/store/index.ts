@@ -92,6 +92,17 @@ export function clearSelectStatus() {
   moveDiff.value = { x: 0, y: 0 }
 }
 
+export function setSelectEnd(x: number, y: number) {
+  selectEnd.value = {
+    x: Math.max(selectStart.value.x, selectEnd.value.x, x),
+    y: Math.max(selectStart.value.y, selectEnd.value.y, y),
+  }
+  selectStart.value = {
+    x: Math.min(selectStart.value.x, x),
+    y: Math.min(selectStart.value.y, y),
+  }
+}
+
 export function clearInherit() {
   inheritRotateAngle.value = 0
   inheritMoveDiff.value = { x: 0, y: 0 }
@@ -160,6 +171,7 @@ watch(transformType, (newVal, oldVal) => {
       } else if ((newVal === "resize")) {
         toDraw = resizePixel(toTransform, selectCentral.value, resizeDiff.value)
       } else {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const n: never = newVal
         toDraw = []
       }
