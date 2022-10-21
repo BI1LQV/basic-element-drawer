@@ -1,3 +1,4 @@
+import type { Ref } from "vue"
 import { ref, watch } from "vue"
 import { PixelState } from "@/model"
 import { fill, is2DArray, sleep } from "@/utils"
@@ -66,3 +67,14 @@ export function fillPlayground() {
     drawLastTime.value / sizeY.value, true)
 }
 
+// selector
+
+export const InitialMouse = () => ({ x: -1, y: -1 })
+
+export function isInitialMouse({ value: { x, y } }: Ref<{ x: number; y: number }>) {
+  return x === -1 && y === -1
+}
+
+export const selectStart = ref(InitialMouse())
+export const selectEnd = ref(InitialMouse())
+export const initialMousePos = ref(InitialMouse())

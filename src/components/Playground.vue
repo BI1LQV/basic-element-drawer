@@ -1,6 +1,9 @@
 <script lang="ts" setup>
+import { type Ref, computed, ref } from "vue"
+import { dot, norm } from "mathjs"
+import Selector from "./Selector.vue"
 import { PixelState } from "@/model"
-import { allowClick, clickedPoint, playgroundState, requestPoint, sizeX, sizeY } from "@/store"
+import { InitialMouse, allowClick, clickedPoint, initialMousePos, isInitialMouse, playgroundState, selectEnd, selectStart, sizeX, sizeY } from "@/store"
 import { pixelToIdx } from "@/utils"
 const STATE_COLOR_MAP = {
   [PixelState.empty]: "bg-gray-500/10",
@@ -8,44 +11,73 @@ const STATE_COLOR_MAP = {
   [PixelState.fill]: "bg-yellow-500/50",
   [PixelState.selected]: "bg-blue-500/50",
 }
-// let isDrawing = false
+const pixels = ref<HTMLDivElement[]>()
+function getPixel({ value: { x, y } }: Ref<{ x: number; y: number }>) {
+  return pixels.value![pixelToIdx(x, y)]
+}
+
 function drawPixel(x: number, y: number) {
-  // if (!isDrawing) { return }
   if (!allowClick.value) { return }
   clickedPoint.value = `${x}_${y}`
   playgroundState.value[pixelToIdx(x, y)] = PixelState.selected
 }
 
-// function startDraw() {
-//   isDrawing = true
-// }
-// function endDraw() {
-//   isDrawing = false
-// }
+function startSelecting(x: number, y: number) {
+  selectStart.value = { x, y }
+}
+function showSelecting(x: number, y: number) {
+  if (isInitialMouse(selectStart)) {
+    return
+  }
+  selectEnd.value = { x, y }
+}
+
+function endSelecting() {
+  selectStart.value = InitialMouse()
+}
+
+function endTransform() {
+  initialMousePos.value = InitialMouse()
+}
+
+const selectCentral = computed(() => {
+  const { x: sx, y: sy } = selectStart.value
+  const { x: ex, y: ey } = selectEnd.value
+  return { x: Math.round((sx + ex) / 2), y: Math.round((sy + ey) / 2) }
+})
+
+function rotate(ev: MouseEvent) {
+  if (isInitialMouse(initialMousePos)) { return }
+  const { clientX, clientY } = ev
+  const { left, top, width, height } = getPixel(selectCentral).getBoundingClientRect()
+  const centerPixel = { x: left + width / 2, y: top + height / 2 }
+  const initialVector = [initialMousePos.value.x - centerPixel.x, initialMousePos.value.y - centerPixel.y]
+  const nowVector = [clientX - centerPixel.x, clientY - centerPixel.y]
+
+  const angle = Math.acos(dot(initialVector, nowVector)
+  // @ts-expect-error
+   / (norm(initialVector, 2) * norm(nowVector, 2)))
+  console.log("angle", angle)
+}
 </script>
 
 <template>
-  <!-- <div flex flex-col @mousedown="startDraw" @mouseup="endDraw">
+  <div flex flex-col select-none @mouseup="endTransform" @mousemove="rotate">
     <div v-for="x of sizeX" :key="x" flex flex-grow flex-row>
       <div
         v-for="y of sizeY" :key="y"
-        flex-grow class="m-0.2"
-        :class="STATE_COLOR_MAP[ playgroundState[(x - 1) * sizeY + (y - 1)] ]"
-        @mouseover="drawPixel((x - 1) * sizeY + (y - 1))"
-      ></div>
-    </div>
-  </div> -->
-  <div flex flex-col>
-    <div v-for="x of sizeX" :key="x" flex flex-grow flex-row>
-      <div
-        v-for="y of sizeY" :key="y"
+        ref="pixels"
         flex-grow m="0.1"
         :class="[
           STATE_COLOR_MAP[ playgroundState[(x - 1) * sizeY + (y - 1)] ],
           allowClick ? 'cursor-pointer' : '',
         ]"
         @click="drawPixel(x - 1, y - 1)"
+        @mousedown="startSelecting(x - 1, y - 1)"
+        @mouseover="showSelecting(x - 1, y - 1)"
+        @mouseup="endSelecting()"
       ></div>
     </div>
+    <Selector :get-pixel="getPixel"></Selector>
   </div>
 </template>
