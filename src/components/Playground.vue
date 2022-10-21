@@ -1,16 +1,16 @@
 <script lang="ts" setup>
 import { type Ref, ref } from "vue"
 import Selector from "./Selector.vue"
-import { PixelState } from "@/model"
+import { PixelState, type Pos } from "@/model"
 import {
   InitialMouse, allowClick,
   clearSelectStatus, clickedPoint,
   initialMousePos,
-  playgroundState,
-  selectCentral, selectEnd,
-  selectStart, sizeX, sizeY, transformType,
+  isInitialMouse,
+  playgroundState, selectCentral,
+  selectEnd, selectStart, sizeX, sizeY, transformType,
 } from "@/store"
-import { pixelToIdx, rotate } from "@/utils"
+import { move, pixelToIdx, resize, rotate } from "@/utils"
 const STATE_COLOR_MAP = {
   [PixelState.empty]: "bg-gray-500/10",
   [PixelState.line]: "bg-gray-500/90",
@@ -19,7 +19,7 @@ const STATE_COLOR_MAP = {
 }
 const pixels = ref<HTMLDivElement[]>()
 const isSelecting = ref(false)
-function getPixel({ value: { x, y } }: Ref<{ x: number; y: number }>) {
+function getPixel({ value: { x, y } }: Ref<Pos>) {
   return pixels.value![pixelToIdx(x, y)]
 }
 
@@ -47,9 +47,25 @@ function endTransform() {
   initialMousePos.value = InitialMouse()
 }
 
-function transformPatcher(ev: MouseEvent) {
+function transformPatcher({ clientX, clientY }: MouseEvent) {
+  if (!transformType.value || isInitialMouse(initialMousePos)) {
+    return
+  }
+  const { left, top, width, height } = getPixel(selectCentral).getBoundingClientRect()
+  const centerPixel = { x: left + width / 2, y: top + height / 2 }
+  const centerToInit = {
+    y: initialMousePos.value.y - centerPixel.y,
+    x: initialMousePos.value.x - centerPixel.x,
+  }
+  const centerToNow = {
+    y: clientY - centerPixel.y, x: clientX - centerPixel.x,
+  }
   if (transformType.value === "rotate") {
-    rotate(ev, getPixel(selectCentral))
+    rotate(centerToInit, centerToNow)
+  } else if (transformType.value === "resize") {
+    resize(centerToInit, centerToNow)
+  } else {
+    const p: never = transformType.value
   }
 }
 </script>

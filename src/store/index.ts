@@ -1,5 +1,5 @@
 import { type Ref, computed, ref, watch } from "vue"
-import { PixelState } from "@/model"
+import { PixelState, type Pos } from "@/model"
 import { fill, is2DArray, sleep } from "@/utils"
 export const sizeX = ref(60)
 export const sizeY = ref(60)
@@ -70,7 +70,7 @@ export function fillPlayground() {
 
 export const InitialMouse = () => ({ x: -1, y: -1 })
 
-export function isInitialMouse({ value: { x, y } }: Ref<{ x: number; y: number }>) {
+export function isInitialMouse({ value: { x, y } }: Ref<Pos>) {
   return x === -1 && y === -1
 }
 
@@ -79,10 +79,14 @@ export const selectEnd = ref(InitialMouse())
 export const initialMousePos = ref(InitialMouse())
 
 export const rotateAngle = ref(0)
+export const moveDiff = ref({ x: 0, y: 0 })
+export const resizeDiff = ref({ x: 1, y: 1 })
 
 export function clearSelectStatus() {
   rotateAngle.value = 0
   selectEnd.value = InitialMouse()
+  resizeDiff.value = { x: 1, y: 1 }
+  moveDiff.value = { x: 0, y: 0 }
 }
 
 export const transformType = ref<"rotate" | "resize" | "move">()
