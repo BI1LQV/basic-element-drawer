@@ -1,5 +1,4 @@
-import type { Ref } from "vue"
-import { ref, watch } from "vue"
+import { type Ref, computed, ref, watch } from "vue"
 import { PixelState } from "@/model"
 import { fill, is2DArray, sleep } from "@/utils"
 export const sizeX = ref(60)
@@ -85,3 +84,12 @@ export function clearSelectStatus() {
   rotateAngle.value = 0
   selectEnd.value = InitialMouse()
 }
+
+export const transformType = ref<"rotate" | "resize" | "move">()
+
+export const selectCentral = computed(() => {
+  const { x: sx, y: sy } = selectStart.value
+  const { x: ex, y: ey } = selectEnd.value
+  return { x: Math.round((sx + ex) / 2), y: Math.round((sy + ey) / 2) }
+})
+

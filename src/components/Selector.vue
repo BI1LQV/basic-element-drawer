@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { Crop, Rank, RefreshLeft } from "@element-plus/icons-vue"
 import { type Ref, reactive, watch } from "vue"
-import { initialMousePos, isInitialMouse, rotateAngle, selectEnd, selectStart } from "@/store"
+import { initialMousePos, isInitialMouse, rotateAngle, selectEnd, selectStart, transformType } from "@/store"
 import { usePx, useRad } from "@/utils"
 const { getPixel } = defineProps<{
   getPixel: ({ value: { x, y } }: Ref<{ x: number; y: number }>) => HTMLDivElement
@@ -33,8 +33,9 @@ watch(selectEnd, () => {
 })
 const renderedPos = usePx(selectorPos)
 const renderedRotate = useRad(rotateAngle)
-function setInitial(ev: MouseEvent, type: "rotate") {
+function setInitial(ev: MouseEvent, type: "rotate" | "resize" | "move") {
   initialMousePos.value = { x: ev.clientX, y: ev.clientY }
+  transformType.value = type
 }
 </script>
 
@@ -46,13 +47,20 @@ function setInitial(ev: MouseEvent, type: "rotate") {
   >
     <div absolute right-0 bottom--6 pointer-events-initial>
       <el-icon
-        l-icon :size="20" color="black"
         @mousedown="setInitial($event, 'rotate')"
       >
         <RefreshLeft />
       </el-icon>
-      <el-icon :size="20" color="black"><Crop /></el-icon>
-      <el-icon><Rank /></el-icon>
+      <el-icon
+        @mousedown="setInitial($event, 'resize')"
+      >
+        <Crop />
+      </el-icon>
+      <el-icon
+        @mousedown="setInitial($event, 'move')"
+      >
+        <Rank />
+      </el-icon>
     </div>
   </div>
 </template>
