@@ -1,3 +1,4 @@
+import { type Ref, computed } from "vue"
 import { sizeY } from "@/store"
 export function pixelToIdx(x: number, y: number) {
   return x * sizeY.value + y
@@ -21,4 +22,14 @@ export function updatePixelToForm<T, K extends keyof T>(
 
 export function is2DArray<T>(arr: T[][] | T[]): arr is T[][] {
   return Array.isArray(arr[0])
+}
+
+export function usePx<T extends Record<string, number>>(o: T) {
+  return computed(() => Object.entries(o).map(([key, val]) => [key, `${val}px`])
+    .reduce((pre, [key, val]) => ({ ...pre, [key]: val }),
+      ({} as Record<keyof T, string>)))
+}
+
+export function useRad(i: Ref<number>) {
+  return computed(() => `${i.value}rad`)
 }

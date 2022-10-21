@@ -1,9 +1,8 @@
 <script lang="ts" setup>
 import { type Ref, computed, ref } from "vue"
-import { dot, norm } from "mathjs"
 import Selector from "./Selector.vue"
 import { PixelState } from "@/model"
-import { InitialMouse, allowClick, clickedPoint, initialMousePos, isInitialMouse, playgroundState, selectEnd, selectStart, sizeX, sizeY } from "@/store"
+import { InitialMouse, allowClick, clickedPoint, initialMousePos, isInitialMouse, playgroundState, rotateAngle, selectEnd, selectStart, sizeX, sizeY } from "@/store"
 import { pixelToIdx } from "@/utils"
 const STATE_COLOR_MAP = {
   [PixelState.empty]: "bg-gray-500/10",
@@ -51,13 +50,12 @@ function rotate(ev: MouseEvent) {
   const { clientX, clientY } = ev
   const { left, top, width, height } = getPixel(selectCentral).getBoundingClientRect()
   const centerPixel = { x: left + width / 2, y: top + height / 2 }
-  const initialVector = [initialMousePos.value.x - centerPixel.x, initialMousePos.value.y - centerPixel.y]
-  const nowVector = [clientX - centerPixel.x, clientY - centerPixel.y]
 
-  const angle = Math.acos(dot(initialVector, nowVector)
-  // @ts-expect-error
-   / (norm(initialVector, 2) * norm(nowVector, 2)))
-  console.log("angle", angle)
+  const initialAngle = Math.atan2(
+    initialMousePos.value.y - centerPixel.y,
+    initialMousePos.value.x - centerPixel.x)
+  const afterAngle = Math.atan2(clientY - centerPixel.y, clientX - centerPixel.x)
+  rotateAngle.value = afterAngle - initialAngle
 }
 </script>
 

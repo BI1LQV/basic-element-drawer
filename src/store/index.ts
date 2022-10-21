@@ -78,3 +78,5 @@ export function isInitialMouse({ value: { x, y } }: Ref<{ x: number; y: number }
 export const selectStart = ref(InitialMouse())
 export const selectEnd = ref(InitialMouse())
 export const initialMousePos = ref(InitialMouse())
+
+export const rotateAngle = ref(0)

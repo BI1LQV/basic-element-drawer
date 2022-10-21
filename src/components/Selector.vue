@@ -1,11 +1,11 @@
 <script lang="ts" setup>
 import { Crop, Rank, RefreshLeft } from "@element-plus/icons-vue"
-import { type Ref, computed, reactive, watch } from "vue"
-import { initialMousePos, selectEnd, selectStart } from "@/store"
-const { getPixel } = defineProps<{ getPixel: ({ value: { x, y } }: Ref<{
-  x: number
-  y: number
-}>) => HTMLDivElement }>()
+import { type Ref, reactive, watch } from "vue"
+import { initialMousePos, rotateAngle, selectEnd, selectStart } from "@/store"
+import { usePx, useRad } from "@/utils"
+const { getPixel } = defineProps<{
+  getPixel: ({ value: { x, y } }: Ref<{ x: number; y: number }>) => HTMLDivElement
+}>()
 
 const selectorPos = reactive({
   left: 0,
@@ -24,35 +24,36 @@ watch(selectEnd, () => {
   selectorPos.width = leftEnd - left + width
   selectorPos.height = topEnd - top + height
 })
-const renderPos = computed(() => {
-  return {
-    left: `${selectorPos.left}px`,
-    top: `${selectorPos.top}px`,
-    width: `${selectorPos.width}px`,
-    height: `${selectorPos.height}px`,
-  }
-})
+const renderedPos = usePx(selectorPos)
+const renderedRotate = useRad(rotateAngle)
 function setInitial(ev: MouseEvent, type: "rotate") {
   initialMousePos.value = { x: ev.clientX, y: ev.clientY }
 }
 </script>
 
 <template>
-  <Teleport to="#app">
-    <div
-      absolute :style="renderPos"
-      border="2px blue-500/50" pointer-events-none
-    >
-      <div absolute right-0 bottom--6 pointer-events-initial>
-        <el-icon
-          l-icon :size="20" color="black"
-          @mousedown="setInitial($event, 'rotate')"
-        >
-          <RefreshLeft />
-        </el-icon>
-        <el-icon :size="20" color="black"><Crop /></el-icon>
-        <el-icon><Rank /></el-icon>
-      </div>
+  <!-- <Teleport to="#app"> -->
+  <div
+    id="selector" absolute
+    :style="renderedPos" border="2px blue-500/50"
+    pointer-events-none
+  >
+    <div absolute right-0 bottom--6 pointer-events-initial>
+      <el-icon
+        l-icon :size="20" color="black"
+        @mousedown="setInitial($event, 'rotate')"
+      >
+        <RefreshLeft />
+      </el-icon>
+      <el-icon :size="20" color="black"><Crop /></el-icon>
+      <el-icon><Rank /></el-icon>
     </div>
-  </Teleport>
+  </div>
+  <!-- </Teleport> -->
 </template>
+
+<style>
+#selector {
+  transform: rotate(v-bind(renderedRotate));
+}
+</style>
