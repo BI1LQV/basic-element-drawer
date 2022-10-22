@@ -1,9 +1,8 @@
 <script lang="ts" setup>
 import { Crop, Rank, RefreshLeft } from "@element-plus/icons-vue"
 import { type Ref, computed, reactive, ref, watch } from "vue"
-import { clearDiff, clearInherit, getBlockDiff, inheritMoveDiff, initialMousePos, isInitialMouse, moveDiff, resizeDiff, rotateAngle, selectCentral, selectEnd, selectStart, stopTransform, transformType } from "@/store"
-import { idxToPixel, movePixel, pixelToIdx, rotatePixel, usePx, useRad, useXY } from "@/utils"
-import { PixelState } from "@/model"
+import { initialMousePos, isInitialMouse, moveDiff, resizeDiff, rotateAngle, selectEnd, selectStart, transformType } from "@/store"
+import { usePx, useRad, useXY } from "@/utils"
 const { getPixel } = defineProps<{
   getPixel: ({ value: { x, y } }: Ref<{ x: number; y: number }>) => HTMLElement
 }>()
@@ -39,42 +38,6 @@ const renderedTranslate = useXY(moveDiff, true)
 
 const isChangingType = ref(false)
 function setInitial(ev: MouseEvent, type: "rotate" | "resize" | "move") {
-  if (transformType.value && transformType.value !== type) {
-    if (transformType.value === "move") {
-      const [[newStart, _1], [newEnd, _2]] = movePixel([
-        [pixelToIdx(selectStart.value.x, selectStart.value.y), PixelState.selected],
-        [pixelToIdx(selectEnd.value.x, selectEnd.value.y), PixelState.selected],
-      ], getBlockDiff()!)
-      const [newStartX, newStartY] = idxToPixel(newStart)
-      const [newEndX, newEndY] = idxToPixel(newEnd)
-      selectStart.value = { x: newStartX, y: newStartY }
-      selectEnd.value = { x: newEndX, y: newEndY }
-    } else if (transformType.value === "rotate") {
-      const [[p1, _1], [p2, _2], [p3, _3], [p4, _]] = rotatePixel([
-        [pixelToIdx(selectStart.value.x, selectStart.value.y), PixelState.selected],
-        [pixelToIdx(selectEnd.value.x, selectEnd.value.y), PixelState.selected],
-        [pixelToIdx(selectStart.value.x, selectEnd.value.y), PixelState.selected],
-        [pixelToIdx(selectEnd.value.x, selectStart.value.y), PixelState.selected],
-      ], selectCentral.value, -rotateAngle.value)
-      const [x1, y1] = idxToPixel(p1)
-      const [x2, y2] = idxToPixel(p2)
-      const [x3, y3] = idxToPixel(p3)
-      const [x4, y4] = idxToPixel(p4)
-      selectStart.value = { x: Math.min(x1, x2, x3, x4), y: Math.min(y1, y2, y3, y4) }
-      selectEnd.value = { x: Math.max(x1, x2, x3, x4), y: Math.max(y1, y2, y3, y4) }
-    } else if (transformType.value === "resize") {
-      // TODO: 待完成
-    } else {
-      const n: never = transformType.value
-    }
-    stopTransform.value()
-    isChangingType.value = true
-    clearInherit()
-    clearDiff()
-    setTimeout(() => {
-      isChangingType.value = false
-    }, 150)
-  }
   initialMousePos.value = { x: ev.clientX, y: ev.clientY }
   transformType.value = type
 }
@@ -114,7 +77,7 @@ const negativeResizeDiff = computed(() => `${1 / resizeDiff.value.x} ,${1 / resi
 
 <style>
 #selector {
-  transform: rotate(v-bind(renderedRotate)) scale(v-bind(renderedScale)) translate(v-bind(renderedTranslate));
+  transform:translate(v-bind(renderedTranslate)) scale(v-bind(renderedScale)) rotate(v-bind(renderedRotate)) ;
 }
 #operator{
   transform: scale(v-bind(negativeResizeDiff));

@@ -8,11 +8,12 @@ import {
   clickedPoint,
   inheritThree,
   initialMousePos, isInitialMouse,
-  playgroundState, selectCentral, selectStart, setSelectEnd,
+  playgroundState, selectStart, setSelectEnd,
   sizeX,
   sizeY,
   stopTransform,
   transformType,
+  transformedSelectCentral,
 } from "@/store"
 import { move, pixelToIdx, resize, rotate, xyToId } from "@/utils"
 const STATE_COLOR_MAP = {
@@ -58,7 +59,7 @@ function transformPatcher({ clientX, clientY }: MouseEvent) {
   if (!transformType.value || isInitialMouse(initialMousePos)) {
     return
   }
-  const { left, top, width, height } = getPixel(selectCentral).getBoundingClientRect()
+  const { left, top, width, height } = getPixel(transformedSelectCentral).getBoundingClientRect()
   const centerPixel = { x: left + width / 2, y: top + height / 2 }
   const centerToInit = {
     y: initialMousePos.value.y - centerPixel.y,

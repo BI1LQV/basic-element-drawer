@@ -1,6 +1,6 @@
 import { type Ref, computed, ref, watch } from "vue"
 import { PixelState, type Pos } from "@/model"
-import { fill, idxToPixel, is2DArray, isLegal, movePixel, pixelToIdx, resizePixel, rotatePixel, sleep, xyToId } from "@/utils"
+import { fill, idxToPixel, is2DArray, isLegal, pixelToIdx, resizeMix, sleep, xyToId } from "@/utils"
 export const sizeX = ref(60)
 export const sizeY = ref(60)
 
@@ -128,6 +128,15 @@ export const selectCentral = computed(() => {
   return { x: Math.round((sx + ex) / 2), y: Math.round((sy + ey) / 2) }
 })
 
+export const transformedSelectCentral = computed(() => {
+  const { x, y } = selectCentral.value
+  const [[newIdx, _]] = resizeMix([[pixelToIdx(x, y), PixelState.selected]],
+    rotateAngle.value, { x, y },
+    moveDiff.value, resizeDiff.value)
+  const [retX, retY] = idxToPixel(newIdx)
+  return { x: retX, y: retY }
+})
+
 export function snapshotPlayground() {
   const toTransform: [number, PixelState][] = []
   const snapshot = playgroundState.value.map((state, idx) => {
@@ -147,11 +156,6 @@ export function snapshotPlayground() {
 }
 
 export const stopTransform = ref(() => {})
-const WATCH_MAP = {
-  "rotate": rotateAngle,
-  "move": moveDiff,
-  "resize": resizeDiff,
-}
 export function getBlockDiff() {
   const blockDiff = { ...moveDiff.value }
   const pixelDom = document.getElementById(xyToId(0, 0))
@@ -164,36 +168,21 @@ export function getBlockDiff() {
 }
 
 watch(transformType, (newVal, oldVal) => {
-  if (!newVal) { return }
-  // if (!(!oldVal && newVal)) {
-  //   return
-  // }
-  stopTransform.value()
-  // 新transformType，开始transform
-  const { snapshot, toTransform } = snapshotPlayground()
-  stopTransform.value = watch(WATCH_MAP[newVal], () => {
-    setTimeout(() => {
-      playgroundState.value = [...snapshot]
-      let toDraw: number[][]
-      if (newVal === "rotate") {
-        toDraw = rotatePixel(toTransform, selectCentral.value, rotateAngle.value)
-      } else if (newVal === "move") {
+  if (!oldVal && newVal) {
+    console.log("????")
+    const { snapshot, toTransform } = snapshotPlayground()
+    stopTransform.value = watch([rotateAngle, moveDiff, resizeDiff], () => {
+      setTimeout(() => {
+        playgroundState.value = [...snapshot]
         const blockDiff = getBlockDiff()
         if (blockDiff) {
-          toDraw = movePixel(toTransform, blockDiff)
-        } else {
-          toDraw = []
+          resizeMix(toTransform, rotateAngle.value,
+            selectCentral.value, blockDiff,
+            resizeDiff.value).forEach(([idx, state]) => {
+            playgroundState.value[idx] = state
+          })
         }
-      } else if ((newVal === "resize")) {
-        toDraw = resizePixel(toTransform, selectCentral.value, resizeDiff.value)
-      } else {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const n: never = newVal
-        toDraw = []
-      }
-      toDraw.forEach(([idx, state]) => {
-        playgroundState.value[idx] = state
       })
     })
-  })
+  }
 })
