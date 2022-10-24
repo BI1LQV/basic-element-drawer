@@ -82,7 +82,7 @@ export const rotateAngle = ref(0)
 export const moveDiff = ref({ x: 0, y: 0 })
 export const resizeDiff = ref({ x: 1, y: 1 })
 
-export const transformPath: TransformPath = []
+export const transformPath: TransformPath[] = []
 
 export const transformType = ref<"rotate" | "resize" | "move">()
 
@@ -116,13 +116,9 @@ export function clearDiff() {
 }
 
 export function inheritThree() {
-  if (transformType.value === "move") {
-    transformPath.push({ ...moveDiff.value, type: "move" })
-  } else if (transformType.value === "resize") {
-    transformPath.push({ ...resizeDiff.value, type: "resize" })
-  } else if (transformType.value === "rotate") {
-    transformPath.push({ value: rotateAngle.value, type: "rotate" })
-  }
+  const trans = getTrans()
+  trans && transformPath.push(trans)
+  console.log(transformPath)
 }
 
 export const selectCentral = computed(() => {
@@ -171,18 +167,28 @@ export function getBlockDiff() {
   }
 }
 
+const blockDiff = computed(() => getBlockDiff()!)
+
+function getTrans(): TransformPath | null {
+  if (transformType.value === "move") {
+    return ({ ...blockDiff.value, type: "move" })
+  } else if (transformType.value === "resize") {
+    return ({ ...resizeDiff.value, type: "resize" })
+  } else if (transformType.value === "rotate") {
+    return ({ value: rotateAngle.value, type: "rotate" })
+  } else {
+    return null
+  }
+}
 watch(transformType, (newVal, oldVal) => {
   if (!oldVal && newVal) {
     const { snapshot, toTransform } = snapshotPlayground()
     stopTransform.value = watch([rotateAngle, moveDiff, resizeDiff], () => {
       setTimeout(() => {
         playgroundState.value = [...snapshot]
-        const blockDiff = getBlockDiff()
-        if (blockDiff) {
-          resizeMix(toTransform, selectCentral.value, transformPath).forEach(([idx, state]) => {
-            playgroundState.value[idx] = state
-          })
-        }
+        resizeMix(toTransform, selectCentral.value, [...transformPath, getTrans()!]).forEach(([idx, state]) => {
+          playgroundState.value[idx] = state
+        })
       })
     })
   }

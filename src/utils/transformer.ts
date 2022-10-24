@@ -56,7 +56,7 @@ function matrixChainMul(toTransform: [number, PixelState][], ...matrixs: number[
 export function resizeMix(
   toTransform: [number, PixelState][],
   { x: cX, y: cY }: Pos,
-  transformPath: TransformPath) {
+  transformPath: TransformPath[]) {
   const m1 = TRANSLATE_MAT(-cX, -cY)// 平移到原点
   const mm = transformPath.map((trans) => {
     if (trans.type === "move") {
