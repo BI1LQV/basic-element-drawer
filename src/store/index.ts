@@ -1,5 +1,5 @@
 import { type Ref, computed, ref, watch } from "vue"
-import { PixelState, type Pos } from "@/model"
+import { PixelState, type Pos, type TransformPath } from "@/model"
 import { fill, idxToPixel, is2DArray, isLegal, pixelToIdx, resizeMix, sleep, xyToId } from "@/utils"
 export const sizeX = ref(60)
 export const sizeY = ref(60)
@@ -81,10 +81,11 @@ export const initialMousePos = ref(InitialMouse())
 export const rotateAngle = ref(0)
 export const moveDiff = ref({ x: 0, y: 0 })
 export const resizeDiff = ref({ x: 1, y: 1 })
+
+export const transformPath: TransformPath = []
+
 export const transformType = ref<"rotate" | "resize" | "move">()
-export const inheritRotateAngle = ref(0)
-export const inheritMoveDiff = ref({ x: 0, y: 0 })
-export const inheritResizeDiff = ref({ x: 1, y: 1 })
+
 export function clearSelectStatus() {
   rotateAngle.value = 0
   selectEnd.value = InitialMouse()
@@ -104,9 +105,7 @@ export function setSelectEnd(x: number, y: number) {
 }
 
 export function clearInherit() {
-  inheritRotateAngle.value = 0
-  inheritMoveDiff.value = { x: 0, y: 0 }
-  inheritResizeDiff.value = { x: 1, y: 1 }
+  transformPath.length = 0
   transformType.value = undefined
 }
 
@@ -117,9 +116,13 @@ export function clearDiff() {
 }
 
 export function inheritThree() {
-  inheritRotateAngle.value = rotateAngle.value
-  inheritMoveDiff.value = moveDiff.value
-  inheritResizeDiff.value = resizeDiff.value
+  if (transformType.value === "move") {
+    transformPath.push({ ...moveDiff.value, type: "move" })
+  } else if (transformType.value === "resize") {
+    transformPath.push({ ...resizeDiff.value, type: "resize" })
+  } else if (transformType.value === "rotate") {
+    transformPath.push({ value: rotateAngle.value, type: "rotate" })
+  }
 }
 
 export const selectCentral = computed(() => {
@@ -130,9 +133,10 @@ export const selectCentral = computed(() => {
 
 export const transformedSelectCentral = computed(() => {
   const { x, y } = selectCentral.value
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [[newIdx, _]] = resizeMix([[pixelToIdx(x, y), PixelState.selected]],
-    rotateAngle.value, { x, y },
-    moveDiff.value, resizeDiff.value)
+    { x, y },
+    transformPath)
   const [retX, retY] = idxToPixel(newIdx)
   return { x: retX, y: retY }
 })
@@ -169,16 +173,13 @@ export function getBlockDiff() {
 
 watch(transformType, (newVal, oldVal) => {
   if (!oldVal && newVal) {
-    console.log("????")
     const { snapshot, toTransform } = snapshotPlayground()
     stopTransform.value = watch([rotateAngle, moveDiff, resizeDiff], () => {
       setTimeout(() => {
         playgroundState.value = [...snapshot]
         const blockDiff = getBlockDiff()
         if (blockDiff) {
-          resizeMix(toTransform, rotateAngle.value,
-            selectCentral.value, blockDiff,
-            resizeDiff.value).forEach(([idx, state]) => {
+          resizeMix(toTransform, selectCentral.value, transformPath).forEach(([idx, state]) => {
             playgroundState.value[idx] = state
           })
         }

@@ -10,3 +10,4 @@ export enum LineAlgorism {
 }
 
 export interface Pos {x: number; y: number}
+export type TransformPath = ({ x: number; y: number; type: "resize" | "move" } | { value: number;type: "rotate" })[]

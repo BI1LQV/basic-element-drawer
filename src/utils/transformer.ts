@@ -1,20 +1,20 @@
 import { multiply } from "mathjs"
 import { idxToPixel, isLegal, pixelToIdx } from "./utils"
-import type { PixelState, Pos } from "@/model"
-import { inheritMoveDiff, inheritResizeDiff, inheritRotateAngle, moveDiff, resizeDiff, rotateAngle } from "@/store"
+import type { PixelState, Pos, TransformPath } from "@/model"
+import { moveDiff, resizeDiff, rotateAngle } from "@/store"
 
 export function rotate(init: Pos, now: Pos) {
   const initialAngle = Math.atan2(init.y, init.x)
   const afterAngle = Math.atan2(now.y, now.x)
-  rotateAngle.value = afterAngle - initialAngle + inheritRotateAngle.value
+  rotateAngle.value = afterAngle - initialAngle
 }
 
 export function resize(init: Pos, now: Pos) {
-  resizeDiff.value = { x: now.x / init.x * inheritResizeDiff.value.x, y: now.y / init.y * inheritResizeDiff.value.y }
+  resizeDiff.value = { x: now.x / init.x, y: now.y / init.y }
 }
 
 export function move(init: Pos, now: Pos) {
-  moveDiff.value = { x: (now.x - init.x) + inheritMoveDiff.value.x, y: now.y - init.y + inheritMoveDiff.value.y }
+  moveDiff.value = { x: (now.x - init.x), y: now.y - init.y }
 }
 const { cos, sin, round } = Math
 
@@ -55,14 +55,23 @@ function matrixChainMul(toTransform: [number, PixelState][], ...matrixs: number[
 
 export function resizeMix(
   toTransform: [number, PixelState][],
-  theta: number,
   { x: cX, y: cY }: Pos,
-  { x: tx, y: ty }: Pos,
-  { x: sx, y: sy }: Pos) {
+  transformPath: TransformPath) {
   const m1 = TRANSLATE_MAT(-cX, -cY)// 平移到原点
-  const m2 = RESIZE_MAT(sy, sx)// 缩放
-  const m3 = ROTATE_MAT(-theta)// 旋转
-  const m4 = TRANSLATE_MAT(cX, cY)// 平移回去
-  const m5 = TRANSLATE_MAT(ty, tx)// 平移
-  return matrixChainMul(toTransform, m1, m2, m3, m4, m5)
+  const mm = transformPath.map((trans) => {
+    if (trans.type === "move") {
+      return TRANSLATE_MAT(trans.y, trans.x)// 平移
+    } else if (trans.type === "resize") {
+      return RESIZE_MAT(trans.y, trans.x)// 缩放
+    } else if (trans.type === "rotate") {
+      return ROTATE_MAT(-trans.value)
+    } else {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const n: never = trans.type
+      return []
+    }
+  })
+  const m2 = TRANSLATE_MAT(cX, cY)// 平移回去
+
+  return matrixChainMul(toTransform, m1, ...mm, m2)
 }
