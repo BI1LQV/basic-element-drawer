@@ -132,7 +132,7 @@ export const transformedSelectCentral = computed(() => {
   const { x, y } = selectCentral.value
   const [[newIdx, _]] = resizeMix([[pixelToIdx(x, y), PixelState.selected]],
     rotateAngle.value, { x, y },
-    moveDiff.value, resizeDiff.value)
+    getBlockDiff()!, resizeDiff.value)
   const [retX, retY] = idxToPixel(newIdx)
   return { x: retX, y: retY }
 })
