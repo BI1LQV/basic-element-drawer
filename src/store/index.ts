@@ -78,14 +78,15 @@ export const selectStart = ref(InitialMouse())
 export const selectEnd = ref(InitialMouse())
 export const initialMousePos = ref(InitialMouse())
 
-export const rotateAngle = ref(0)
-export const moveDiff = ref({ x: 0, y: 0 })
-export const resizeDiff = ref({ x: 1, y: 1 })
-export const transformType = ref<"rotate" | "resize" | "move">()
+export const rotateAngle = ref(0)// 旋转角度
+export const moveDiff = ref({ x: 0, y: 0 })// 平移变动量
+export const resizeDiff = ref({ x: 1, y: 1 })// 缩放变动量
+export const transformType = ref<"rotate" | "resize" | "move">()// 记录当前操作的类型 如果不在操作，则为undefined
+// 以下是之前操作的记录
 export const inheritRotateAngle = ref(0)
 export const inheritMoveDiff = ref({ x: 0, y: 0 })
 export const inheritResizeDiff = ref({ x: 1, y: 1 })
-export function clearSelectStatus() {
+export function clearSelectStatus() { // 清除选择状态
   rotateAngle.value = 0
   selectEnd.value = InitialMouse()
   resizeDiff.value = { x: 1, y: 1 }
@@ -93,6 +94,7 @@ export function clearSelectStatus() {
 }
 
 export function setSelectEnd(x: number, y: number) {
+  // 处理各种非从左上到右下的情况
   selectEnd.value = {
     x: Math.max(selectStart.value.x, selectEnd.value.x, x),
     y: Math.max(selectStart.value.y, selectEnd.value.y, y),
@@ -103,33 +105,31 @@ export function setSelectEnd(x: number, y: number) {
   }
 }
 
-export function clearInherit() {
+export function clearInherit() { // 下次变化开始 清除之前的状态
   inheritRotateAngle.value = 0
   inheritMoveDiff.value = { x: 0, y: 0 }
   inheritResizeDiff.value = { x: 1, y: 1 }
   transformType.value = undefined
 }
 
-export function clearDiff() {
-  rotateAngle.value = 0
-  moveDiff.value = { x: 0, y: 0 }
-  resizeDiff.value = { x: 1, y: 1 }
-}
-
 export function inheritThree() {
+  // 每次变化结束，但是又没有取消选中 可能之后还有变换 所以存储当前状态
   inheritRotateAngle.value = rotateAngle.value
   inheritMoveDiff.value = moveDiff.value
   inheritResizeDiff.value = resizeDiff.value
 }
 
 export const selectCentral = computed(() => {
+  // 框选的中心 辅助计算旋转等
   const { x: sx, y: sy } = selectStart.value
   const { x: ex, y: ey } = selectEnd.value
   return { x: Math.round((sx + ex) / 2), y: Math.round((sy + ey) / 2) }
 })
 
 export const transformedSelectCentral = computed(() => {
+  // 如果有平移 需要该变量来计算平移后的选择中心
   const { x, y } = selectCentral.value
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [[newIdx, _]] = resizeMix([[pixelToIdx(x, y), PixelState.selected]],
     rotateAngle.value, { x, y },
     getBlockDiff()!, resizeDiff.value)
@@ -138,14 +138,15 @@ export const transformedSelectCentral = computed(() => {
 })
 
 export function snapshotPlayground() {
-  const toTransform: [number, PixelState][] = []
+  const toTransform: [number, PixelState][] = []// 存储需要变换的像素
   const snapshot = playgroundState.value.map((state, idx) => {
     const [ix, iy] = idxToPixel(idx)
     if (
       ix > selectStart.value.x && ix < selectEnd.value.x
       && iy > selectStart.value.y && iy < selectEnd.value.y
-    ) {
+    ) { // 在需要变换的区域
       if (state === PixelState.fill || state === PixelState.line) {
+        // 只有非空像素需要变化
         toTransform.push([idx, state])
       }
       return PixelState.empty
@@ -155,13 +156,14 @@ export function snapshotPlayground() {
   return { snapshot, toTransform }
 }
 
-export const stopTransform = ref(() => {})
+export const stopTransform = ref(() => {})// 存储watcher的取消器
 export function getBlockDiff() {
+  // moveDiff存储的是鼠标平移的变化量，事实上显示的模拟像素比实际鼠标平移像素差了很多，需要该函数进行一次转换
   const blockDiff = { ...moveDiff.value }
-  const pixelDom = document.getElementById(xyToId(0, 0))
+  const pixelDom = document.getElementById(xyToId(0, 0))// 获取一个虚拟像素的实际尺寸
   if (pixelDom) {
     const { margin, width, height } = getComputedStyle(pixelDom)
-    blockDiff.x /= parseFloat(margin) + parseFloat(width)
+    blockDiff.x /= parseFloat(margin) + parseFloat(width)// 除以模拟像素的宽度加外边距
     blockDiff.y /= parseFloat(margin) + parseFloat(height)
     return blockDiff
   }
@@ -169,17 +171,19 @@ export function getBlockDiff() {
 
 watch(transformType, (newVal, oldVal) => {
   if (!oldVal && newVal) {
-    console.log("????")
+    // 之前的transformType是空 并且有新的transformType 说明新的选择开始了
+    // 快照
     const { snapshot, toTransform } = snapshotPlayground()
     stopTransform.value = watch([rotateAngle, moveDiff, resizeDiff], () => {
+      // 每次有变化的时候调用该函数计算图像变化
       setTimeout(() => {
-        playgroundState.value = [...snapshot]
+        playgroundState.value = [...snapshot]// 拷贝一次snapshot 防止污染
         const blockDiff = getBlockDiff()
         if (blockDiff) {
           resizeMix(toTransform, rotateAngle.value,
             selectCentral.value, blockDiff,
             resizeDiff.value).forEach(([idx, state]) => {
-            playgroundState.value[idx] = state
+            playgroundState.value[idx] = state// 把变化后的像素施加到实际显示的数组上
           })
         }
       })

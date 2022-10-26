@@ -35,11 +35,12 @@ function drawPixel(x: number, y: number) {
 }
 
 function startSelecting(x: number, y: number) {
-  selectStart.value = { x, y }
-  isSelecting.value = true
-  clearSelectStatus()
-  clearInherit()
-  stopTransform.value()
+  // 开始框选变形区域
+  selectStart.value = { x, y }// 设置框选初始点
+  isSelecting.value = true// 设置框选flag
+  clearSelectStatus()// 清除之前的图形变形参数
+  clearInherit()// 清除之前的图形变形继承
+  stopTransform.value()// 清除之前对变形参数的watcher
 }
 function showSelecting(x: number, y: number) {
   if (!isSelecting.value) { return }
@@ -56,7 +57,9 @@ function endTransform() {
 }
 
 function transformPatcher({ clientX, clientY }: MouseEvent) {
+  // 鼠标移动时 做事件派发
   if (!transformType.value || isInitialMouse(initialMousePos)) {
+    // 没有transformType 或者初始鼠标位置为初始值 则不处在框选状态 不需要派发事件
     return
   }
   const { left, top, width, height } = getPixel(transformedSelectCentral).getBoundingClientRect()
@@ -65,9 +68,11 @@ function transformPatcher({ clientX, clientY }: MouseEvent) {
     y: initialMousePos.value.y - centerPixel.y,
     x: initialMousePos.value.x - centerPixel.x,
   }
+  // 计算图形中心到鼠标位置的向量
   const centerToNow = {
     y: clientY - centerPixel.y, x: clientX - centerPixel.x,
   }
+  // 根据变化类型派发事件
   if (transformType.value === "rotate") {
     rotate(centerToInit, centerToNow)
   } else if (transformType.value === "resize") {
@@ -81,7 +86,10 @@ function transformPatcher({ clientX, clientY }: MouseEvent) {
 </script>
 
 <template>
-  <div flex flex-col select-none @mouseup="endTransform" @mousemove="transformPatcher">
+  <div
+    flex flex-col select-none
+    @mouseup="endTransform" @mousemove="transformPatcher"
+  >
     <div v-for="x of sizeX" :key="x" flex flex-grow flex-row>
       <div
         v-for="y of sizeY" :id="xyToId(x - 1, y - 1)"
